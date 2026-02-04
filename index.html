@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neo AI</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
+        
+        /* আইকন সাইজ ছোট করার জন্য বিশেষ কোড */
+        flowise-fullchatbot::part(bot-avatar) {
+            width: 35px !important;
+            height: 35px !important;
+            border-radius: 50%;
+        }
+        flowise-fullchatbot::part(user-avatar) {
+            width: 35px !important;
+            height: 35px !important;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <flowise-fullchatbot></flowise-fullchatbot>
+    <script type="module">
+        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+        Chatbot.initFull({
+            chatflowid: "e054b9ea-016e-4674-a753-7ab126bd2af3",
+            apiHost: "https://flowise-dr4d.onrender.com",
+            theme: {
+                chatWindow: {
+                    showTitle: true,
+                    title: 'Neo AI',
+                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png',
+                    welcomeMessage: 'হ্যালো! আমি Neo',
+                    backgroundColor: "#ffffff",
+                    fontSize: 16,
+                    botMessage: {
+                        backgroundColor: "#f2f2f7",
+                        textColor: "#303235",
+                        showAvatar: true,
+                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png'
+                    },
+                    userMessage: {
+                        backgroundColor: "#007AFF",
+                        textColor: "#ffffff",
+                        showAvatar: true,
+                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
+                    },
+                    textInput: {
+                        placeholder: 'এখানে লিখুন...',
+                        backgroundColor: '#ffffff',
+                        sendButtonColor: '#007AFF'
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
