@@ -4,91 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neo AI | Elite Cyber Mentor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        /* অ্যাভাটার এবং বাবল স্টাইলিং */
-        flowise-fullchatbot::part(bot-avatar) { 
-            width: 38px !important; height: 38px !important; 
-            border-radius: 50% !important; 
-        }
-        
-        flowise-fullchatbot::part(user-avatar) { 
-            width: 38px !important; height: 38px !important; 
-            border-radius: 50% !important; 
-        }
-
-        /* ইনপুট বক্স প্রফেশনাল লুক */
-        flowise-fullchatbot::part(input) {
-            border-radius: 20px !important;
-            border: 1px solid #e0e0e0 !important;
-        }
-
-        /* পাওয়ারড বাই পুরোপুরি হাইড করা */
-        flowise-fullchatbot::part(powered-by) {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-        }
-
-        /* প্রিমিয়াম ফুটার */
-        .premium-footer { 
-            position: fixed; bottom: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(5px);
-            text-align: center; padding: 10px 0; 
-            font-size: 10px; color: #888; 
-            border-top: 1px solid rgba(0,0,0,0.05); 
-            z-index: 999; text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .premium-footer b { color: #0062ff; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #f4f7f9; }
+        flowise-fullchatbot::part(bot-avatar) { width: 40px !important; height: 40px !important; border-radius: 50% !important; }
+        flowise-fullchatbot::part(powered-by) { display: none !important; visibility: hidden !important; height: 0 !important; }
+        .custom-footer { position: fixed; bottom: 0; width: 100%; background: #fff; text-align: center; padding: 10px 0; font-size: 11px; color: #888; border-top: 1px solid #eee; z-index: 999; letter-spacing: 1.5px; font-weight: 600; }
+        .custom-footer b { color: #007AFF; }
     </style>
 </head>
 <body>
-
     <flowise-fullchatbot></flowise-fullchatbot>
-
-    <div class="premium-footer">
-        Architected by <b>OXACIDER</b> • Ver 2.1
-    </div>
+    <div class="custom-footer">ARCHITECTED BY <b>OXACIDER</b></div>
 
     <script type="module">
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
         Chatbot.initFull({
-            chatflowid: "f4397d5a-c49f-4dc0-977d-8b446cab6ede",
+            chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
             apiHost: "https://neo-nwdz.onrender.com",
             theme: {
                 chatWindow: {
                     showTitle: true,
                     title: 'Neo AI',
-                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png', 
-                    welcomeMessage: 'Hi! আমি Neo।',
-                    backgroundColor: "#ffffff",
-                    fontSize: 16,
-                    showPoweredBy: false, 
-
+                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png',
+                    welcomeMessage: 'আসসালামু আলাইকুম! আমি Neo।',
+                    showPoweredBy: false,
                     botMessage: {
-                        backgroundColor: "#f2f2f7",
-                        textColor: "#303235",
                         showAvatar: true,
                         avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png'
                     },
                     userMessage: {
-                        backgroundColor: "#0062ff",
+                        backgroundColor: "#007AFF",
                         textColor: "#ffffff",
                         showAvatar: true,
                         avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
-                    },
-                    textInput: {
-                        placeholder: 'নিও-কে কিছু জিজ্ঞাসা করুন...',
-                        backgroundColor: '#ffffff',
-                        sendButtonColor: '#0062ff'
                     }
                 }
             }
