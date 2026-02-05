@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neo AI - Your Cyber Mentor</title>
+    <title>Neo AI - Your Cybersecurity Mentor</title>
     <style>
+        /* পুরো স্ক্রিন জুড়ে চ্যাটবট সেট করা */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #f4f7f9; }
-
-        /* বট এবং ইউজারের অ্যাভাটার কাস্টমাইজেশন */
-        flowise-fullchatbot::part(bot-avatar) {
-            width: 40px !important;
-            height: 40px !important;
-            border: 2px solid #007AFF;
-        }
-        flowise-fullchatbot::part(user-avatar) {
-            width: 40px !important;
-            height: 40px !important;
+        
+        /* বটের গোল লোগো ডিজাইন */
+        flowise-fullchatbot::part(bot-avatar) { 
+            width: 40px !important; 
+            height: 40px !important; 
+            border-radius: 50%; 
+            border: 1px solid #007AFF;
         }
 
-        /* নিচের পাওয়ারড বাই সেকশন স্টাইল */
-        .custom-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #ffffff;
-            text-align: center;
-            padding: 5px 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-            z-index: 999;
-            letter-spacing: 1px;
+        /* নিচে কাস্টম পাওয়ারড বাই টেক্সট */
+        .custom-footer { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: #ffffff; 
+            text-align: center; 
+            padding: 6px 0; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-size: 11px; 
+            color: #888; 
+            border-top: 1px solid #eee; 
+            z-index: 999; 
+            letter-spacing: 0.5px;
         }
         .custom-footer b { color: #007AFF; }
     </style>
@@ -48,24 +46,23 @@
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
         Chatbot.initFull({
             chatflowid: "f4397d5a-c49f-4dc0-977d-8b446cab6ede",
-            apiHost: "https://flowise-dr4d.onrender.com",
+            apiHost: "https://neo-nwdz.onrender.com",
             theme: {
                 chatWindow: {
                     showTitle: true,
                     title: 'Neo AI',
-                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/2592/2592216.png', // AI Cyber Icon
+                    // এখানে একটি সুন্দর AI Robot আইকন দেওয়া হয়েছে
+                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png', 
                     welcomeMessage: 'Hi! আমি Neo',
                     backgroundColor: "#ffffff",
                     fontSize: 16,
-                    
-                    // ডিফল্ট পাওয়ারড বাই হাইড করে নিজেরটা দেখানোর জন্য
-                    showPoweredBy: false, 
+                    showPoweredBy: false, // ডিফল্ট লোগো হাইড করা হলো
 
                     botMessage: {
                         backgroundColor: "#f2f2f7",
                         textColor: "#303235",
                         showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/2592/2592216.png'
+                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png'
                     },
                     userMessage: {
                         backgroundColor: "#007AFF",
@@ -74,7 +71,7 @@
                         avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
                     },
                     textInput: {
-                        placeholder: 'আপনার প্রশ্নটি এখানে লিখুন...',
+                        placeholder: 'নিও-কে কিছু জিজ্ঞাসা করুন...',
                         backgroundColor: '#ffffff',
                         sendButtonColor: '#007AFF'
                     }
