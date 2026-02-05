@@ -7,7 +7,7 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
         
-        /* আইকন সাইজ ছোট করার জন্য বিশেষ কোড */
+        /* আইকন সাইজ এবং স্টাইল */
         flowise-fullchatbot::part(bot-avatar) {
             width: 35px !important;
             height: 35px !important;
@@ -25,30 +25,39 @@
     <script type="module">
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
         Chatbot.initFull({
-            chatflowid: "0b1a00d3-e7db-43f2-8a0a-5c9b746d38f1",
+            chatflowid: "f4397d5a-c49f-4dc0-977d-8b446cab6ede",
             apiHost: "https://flowise-dr4d.onrender.com",
             theme: {
                 chatWindow: {
                     showTitle: true,
                     title: 'Neo AI',
-                    titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png',
-                    welcomeMessage: 'হ্যালো! আমি Neo',
+                    // এখানে আপনার লোগোর ডিরেক্ট লিঙ্ক বসান
+                    titleAvatarSrc: 'https://ibb.co.com/RRkn21C', 
+                    welcomeMessage: 'আসসালামু আলাইকুম! আমি Neo।',
                     backgroundColor: "#ffffff",
                     fontSize: 16,
+                    
+                    // এখানে নিচের ব্র্যান্ডিং টেক্সট যোগ করা হয়েছে
+                    poweredByTextColor: "#303235",
+                    showPoweredBy: true,
+                    poweredByText: 'POWERED BY OXACIDER',
+                    poweredByLink: 'https://oxacider.com', // এখানে আপনার ওয়েবসাইট বা প্রোফাইল লিঙ্ক দিতে পারেন
+
                     botMessage: {
                         backgroundColor: "#f2f2f7",
                         textColor: "#303235",
                         showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png'
+                        // আপনার লোগো লিঙ্ক এখানেও বসান
+                        avatarSrc: 'https://ibb.co.com/RRkn21C'
                     },
                     userMessage: {
                         backgroundColor: "#007AFF",
                         textColor: "#ffffff",
                         showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
+                        avatarSrc: 'https://ibb.co.com/RRkn21C'
                     },
                     textInput: {
-                        placeholder: 'এখানে লিখুন...',
+                        placeholder: 'Neo-কে কিছু জিজ্ঞাসা করুন...',
                         backgroundColor: '#ffffff',
                         sendButtonColor: '#007AFF'
                     }
