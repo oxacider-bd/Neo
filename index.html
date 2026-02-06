@@ -4,95 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neo AI | Cyber Mentor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neo-bg: #0a0b10;
-            --neo-accent: #00d2ff;
-            --neo-glass: rgba(255, 255, 255, 0.05);
+        /* ===== GLOBAL RESET & BASE STYLES ===== */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
         }
-
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            background: var(--neo-bg); 
+        
+        body {
             font-family: 'Inter', sans-serif;
+            height: 100vh;
+            width: 100%;
             overflow: hidden;
+            background: radial-gradient(circle at top right, #1a1a2e, #0f0f23);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-
-        /* Background Gradient Effect */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -10%; left: -10%;
-            width: 40%; height: 40%;
-            background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, transparent 70%);
-            z-index: 0;
-        }
-
-        /* Flowise Full Chatbot Styling */
-        flowise-fullchatbot::part(container) {
-            background: transparent !important;
-        }
-
-        flowise-fullchatbot::part(chat-window) {
-            background: var(--neo-bg) !important;
-            border: none !important;
-        }
-
-        /* Glassmorphism User Message */
-        flowise-fullchatbot::part(user-message) {
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%) !important;
-            border-radius: 18px 18px 2px 18px !important;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3) !important;
-        }
-
-        /* Bot Message Styling */
-        flowise-fullchatbot::part(bot-message) {
-            background: var(--neo-glass) !important;
-            backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 18px 18px 18px 2px !important;
-            color: #e0e0e0 !important;
-        }
-
-        /* Input Area Styling */
-        flowise-fullchatbot::part(input-container) {
-            background: rgba(255, 255, 255, 0.03) !important;
-            backdrop-filter: blur(20px) !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-            margin: 10px !important;
-            border-radius: 25px !important;
-        }
-
-        /* Avatars Styling */
-        flowise-fullchatbot::part(bot-avatar) { border-radius: 12px !important; }
-        flowise-fullchatbot::part(user-avatar) { border-radius: 12px !important; }
-
-        /* Hide Powered By */
-        flowise-fullchatbot::part(powered-by) { display: none !important; }
-
-        /* Custom Footer Overlay */
-        .premium-branding {
-            position: fixed;
-            bottom: 12px;
-            right: 25px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 2px;
-            pointer-events: none;
+        
+        /* ===== CHAT CONTAINER (Responsive Wrapper) ===== */
+        .chat-container-wrapper {
+            width: 450px; /* Desktop width */
+            height: 85vh; /* Desktop height */
+            max-height: 850px;
+            background: rgba(15, 16, 25, 0.7);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
             z-index: 10;
         }
+
+        /* Ambient Glow Background Objects */
+        .glow-bg {
+            position: fixed;
+            width: 300px; height: 300px;
+            background: #2563eb;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: 0;
+            border-radius: 50%;
+        }
+
+        /* ===== FLOWISE OVERRIDES (Shadow DOM Parts) ===== */
+        flowise-fullchatbot::part(container) { background: transparent !important; }
+        flowise-fullchatbot::part(chat-window) { background: transparent !important; }
+
+        /* User Bubble - Vibrant Gradient */
+        flowise-fullchatbot::part(user-message) {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+            border-radius: 20px 20px 4px 20px !important;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        /* Bot Bubble - Glass Style */
+        flowise-fullchatbot::part(bot-message) {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(5px);
+            border-radius: 20px 20px 20px 4px !important;
+        }
+
+        /* Input Bar Fix */
+        flowise-fullchatbot::part(input-container) {
+            background: rgba(10, 11, 20, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* Custom Branding */
+        .custom-branding {
+            position: fixed;
+            bottom: 15px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            z-index: 5;
+        }
+
+        /* ===== MOBILE RESPONSIVENESS ===== */
+        @media (max-width: 600px) {
+            .chat-container-wrapper {
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+            .custom-branding { bottom: 5px; font-size: 8px; }
+        }
+
     </style>
 </head>
 <body>
+    <div class="glow-bg" style="top: -50px; left: -50px;"></div>
+    <div class="glow-bg" style="bottom: -50px; right: -50px; background: #9333ea;"></div>
 
-    <div class="premium-branding">POWERED BY OXACIDER</div>
+    <div class="chat-container-wrapper">
+        <flowise-fullchatbot></flowise-fullchatbot>
+    </div>
+    
+    <div class="custom-branding">SYTEM ONLINE | DESIGNED BY OXACIDER</div>
 
     <script type="module">
-        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js";
 
-        // LocalStorage logic for returning users
         const savedName = localStorage.getItem('neo_user_name');
 
         Chatbot.initFull({
@@ -100,35 +120,43 @@
             apiHost: "https://neo-nwdz.onrender.com",
             chatflowConfig: {
                 vars: {
-                    user_name: savedName || ""
+                    user_name: savedName || "" 
                 }
             },
             theme: {
                 chatWindow: {
-                    backgroundColor: "#0a0b10",
+                    backgroundColor: "transparent",
                     showTitle: true,
-                    title: 'NEO SYSTEM v5.0',
+                    title: 'NEO SYSTEM',
                     titleAvatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png',
                     welcomeMessage: savedName 
-                        ? `Welcome back, ${savedName}. System Ready. কী শিখবে আজ?` 
-                        : "আসসালামু আলাইকুম, আমি NEO। আপনার AI মেন্টর।",
-                    fontSize: 15,
+                        ? `Welcome back, ${savedName}. System Ready. কী নিয়ে শুরু করবো?` 
+                        : "Hi! আমি NEO। আপনার AI মেন্টর।",
+                    fontSize: 14,
                     botMessage: {
                         showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png'
+                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/4712/4712139.png',
                     },
                     userMessage: {
                         showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
+                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png',
                     },
                     textInput: {
-                        placeholder: 'এখানে লিখুন...',
-                        backgroundColor: 'transparent',
-                        sendButtonColor: '#00d2ff'
+                        placeholder: 'Type your message...',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        textColor: '#ffffff',
+                        sendButtonColor: '#2563eb'
                     }
                 }
             }
-        })
+        });
+
+        // Smart Listener for Name Update
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'neo_set_name' && event.data.name) {
+                localStorage.setItem('neo_user_name', event.data.name.trim());
+            }
+        });
     </script>
 </body>
 </html>
