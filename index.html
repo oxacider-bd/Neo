@@ -7,12 +7,52 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #f8fafc; }
         
-        flowise-fullchatbot::part(header) { background-color: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; padding: 12px 20px !important; }
-        flowise-fullchatbot::part(title) { color: #0f172a !important; font-weight: 700 !important; font-size: 16px !important; }
-        flowise-fullchatbot::part(bot-avatar) { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
+        /* Professional Header */
+        flowise-fullchatbot::part(header) {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding: 12px 20px !important;
+        }
+        
+        flowise-fullchatbot::part(title) {
+            color: #0f172a !important;
+            font-weight: 700 !important;
+            font-size: 16px !important;
+        }
+
+        /* --- MAGIC TYPING EFFECT START --- */
+        /* বটের মেসেজ আসার সময় এই অ্যানিমেশনটা কাজ করবে */
+        flowise-fullchatbot::part(bot-message) {
+            animation: fadeInReveal 0.8s ease-out forwards;
+            overflow: hidden;
+            display: block;
+        }
+
+        @keyframes fadeInReveal {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* --- MAGIC TYPING EFFECT END --- */
+
+        flowise-fullchatbot::part(bot-avatar) { 
+            width: 38px !important; height: 38px !important; 
+            border-radius: 10px !important;
+        }
+
         flowise-fullchatbot::part(powered-by) { display: none !important; }
 
-        .custom-footer { position: fixed; bottom: 0; width: 100%; background: #fff; text-align: center; padding: 10px 0; font-size: 10px; color: #64748b; border-top: 1px solid #f1f5f9; z-index: 999; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; }
+        .custom-footer { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; 
+            text-align: center; padding: 10px 0; font-size: 10px; 
+            color: #64748b; border-top: 1px solid #f1f5f9; z-index: 999; 
+            letter-spacing: 2px; font-weight: 600; text-transform: uppercase; 
+        }
         .custom-footer b { color: #2563eb; }
     </style>
 </head>
@@ -25,20 +65,17 @@
         Chatbot.initFull({
             chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
             apiHost: "https://neo-nwdz.onrender.com",
-            
-            // --- STREAMING FIX START ---
-            streaming: true, // কিছু ভার্সনে এটা লাগে
-            options: {
-                streaming: true // কিছু ভার্সনে এটা লাগে
+            chatflowConfig: {
+                vars: {
+                    streaming: true
+                }
             },
-            // --- STREAMING FIX END ---
-
             theme: {
                 chatWindow: {
                     showTitle: true,
-                    title: 'NEO SYSTEM v5.0',
+                    title: 'NEO SYSTEM',
                     titleAvatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png', 
-                    welcomeMessage: 'আসসালামু আলাইকুম! আমি Neo। আপনাকে কীভাবে সাহায্য করতে পারি?',
+                    welcomeMessage: 'Hi! আমি Neo',
                     backgroundColor: "#f8fafc",
                     fontSize: 15,
                     botMessage: {
