@@ -40,7 +40,7 @@
     <div class="app-container">
         <div class="header">
             <div><span class="status-dot"></span><h1>NEO UNLIMITED v15.0</h1></div>
-            <div style="color: #6b7280; font-size: 10px;" id="key-info">Engine: Active</div>
+            <div style="color: #6b7280; font-size: 10px;">Engine: Google Cloud Server</div>
         </div>
         <div id="chatbox"></div>
         <div class="input-area">
@@ -57,54 +57,28 @@
         const chatbox = document.getElementById('chatbox');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
-        const keyInfo = document.getElementById('key-info');
 
-        const apiKeys = [
-            "AIzaSyB_L_888MNxzY6tzbEMX5MqubtmI7Xqt5k",
-            "AIzaSyAWTPQKzVbtgL6tlX8mN8DAEr4tUvPj9Fw",
-            "AIzaSyASgVjOtHEhIe8a62m39lD-ls9dhsp53bw"
-        ];
-
-        let currentKeyIndex = 0;
-        let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
-        localStorage.setItem('neo_chat_id', chatId);
+        // মামা, তোর দেওয়া গুগল স্ক্রিপ্ট লিঙ্কটা এখানে বসিয়ে দিয়েছি
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOXg0nYy-5fObabDeAXTJ3AemXpbrS5NTrVexmT-D1m4e5c5-mWOG7h3We3QQGFupskQ/exec";
 
         function scrollToBottom() {
             setTimeout(() => { chatbox.scrollTop = chatbox.scrollHeight; }, 100);
         }
 
         async function fetchResponse(message) {
-            for (let i = 0; i < apiKeys.length; i++) {
-                const activeKey = apiKeys[currentKeyIndex];
-                keyInfo.innerText = `Engine: ${currentKeyIndex + 1} of ${apiKeys.length}`;
+            try {
+                // সরাসরি গুগল স্ক্রিপ্টে প্রশ্ন পাঠাচ্ছি
+                const res = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ question: message })
+                });
 
-                try {
-                    const res = await fetch("https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            question: message, // এই লাইনটা তুই আগের কোডে দিস নাই মামা!
-                            overrideConfig: {
-                                sessionId: chatId,
-                                googleGenerativeAIApiKey: activeKey // তোর ফ্লোওয়াইজ অনুযায়ী সঠিক নাম
-                            }
-                        })
-                    });
-
-                    if (res.status === 429) {
-                        currentKeyIndex = (currentKeyIndex + 1) % apiKeys.length;
-                        continue;
-                    }
-
-                    const data = await res.json();
-                    return data.text || data;
-
-                } catch (e) {
-                    console.error("API Error:", e);
-                    currentKeyIndex = (currentKeyIndex + 1) % apiKeys.length;
-                }
+                const data = await res.json();
+                return data.text || "মামা, গুগল কিছু বলতেছে না!";
+            } catch (e) {
+                console.error("Error:", e);
+                return "মামা, সার্ভারে প্যাঁচ লেগেছে! আবার ট্রাই কর।";
             }
-            return "মামা, সব ইঞ্জিনে সমস্যা! একটু পর ট্রাই কর।";
         }
 
         function addMessage(text, sender) {
@@ -118,7 +92,11 @@
             msgDiv.appendChild(img); msgDiv.appendChild(bubble);
             chatbox.appendChild(msgDiv);
 
-            if (sender === 'bot') renderMarkdown(bubble, text); else bubble.textContent = text;
+            if (sender === 'bot') {
+                renderMarkdown(bubble, text);
+            } else {
+                bubble.textContent = text;
+            }
             scrollToBottom();
         }
 
@@ -131,7 +109,8 @@
                     i++;
                     scrollToBottom();
                 } else {
-                    clearInterval(interval); Prism.highlightAll();
+                    clearInterval(interval); 
+                    Prism.highlightAll();
                 }
             }, 10);
         }
@@ -141,6 +120,7 @@
             if (!text) return;
             addMessage(text, 'user');
             userInput.value = "";
+            
             const reply = await fetchResponse(text);
             addMessage(reply, 'bot');
         }
@@ -148,7 +128,7 @@
         sendBtn.addEventListener('click', handleSend);
         userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
-        window.onload = () => { addMessage("Hi! আমি NEO", 'bot'); };
+        window.onload = () => { addMessage("Hi! আমি NEO, এখন সরাসরি Google Engine-এ চলছি। কী সাহায্য করতে পারি?", 'bot'); };
     </script>
 </body>
 </html>
