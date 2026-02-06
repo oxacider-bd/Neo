@@ -7,29 +7,11 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #f8fafc; }
         
-        /* Header Styling */
-        flowise-fullchatbot::part(header) {
-            background-color: #ffffff !important;
-            border-bottom: 1px solid #e2e8f0 !important;
-            padding: 12px 20px !important;
-        }
-        
-        flowise-fullchatbot::part(title) {
-            color: #0f172a !important;
-            font-weight: 700 !important;
-            font-size: 16px !important;
-        }
+        flowise-fullchatbot::part(header) { background-color: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important; padding: 12px 20px !important; }
+        flowise-fullchatbot::part(title) { color: #0f172a !important; font-weight: 700 !important; font-size: 16px !important; }
+        flowise-fullchatbot::part(bot-avatar) { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
+        flowise-fullchatbot::part(powered-by) { display: none !important; }
 
-        /* Bot Avatar */
-        flowise-fullchatbot::part(bot-avatar) { 
-            width: 38px !important; height: 38px !important; 
-            border-radius: 10px !important;
-        }
-
-        /* Hide Powered By */
-        flowise-fullchatbot::part(powered-by) { display: none !important; visibility: hidden !important; height: 0 !important; }
-
-        /* Custom Footer */
         .custom-footer { position: fixed; bottom: 0; width: 100%; background: #fff; text-align: center; padding: 10px 0; font-size: 10px; color: #64748b; border-top: 1px solid #f1f5f9; z-index: 999; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; }
         .custom-footer b { color: #2563eb; }
     </style>
@@ -44,15 +26,19 @@
             chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
             apiHost: "https://neo-nwdz.onrender.com",
             
-            // মামা, এই নিচের লাইনটাই আসল খেলা! এটা স্ট্রিমিং চালু করবে।
-            isStreaming: true, 
+            // --- STREAMING FIX START ---
+            streaming: true, // কিছু ভার্সনে এটা লাগে
+            options: {
+                streaming: true // কিছু ভার্সনে এটা লাগে
+            },
+            // --- STREAMING FIX END ---
 
             theme: {
                 chatWindow: {
                     showTitle: true,
-                    title: 'NEO SYSTEM',
+                    title: 'NEO SYSTEM v5.0',
                     titleAvatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png', 
-                    welcomeMessage: 'Hi! আমি Neo',
+                    welcomeMessage: 'আসসালামু আলাইকুম! আমি Neo। আপনাকে কীভাবে সাহায্য করতে পারি?',
                     backgroundColor: "#f8fafc",
                     fontSize: 15,
                     botMessage: {
@@ -69,8 +55,6 @@
                     },
                     textInput: {
                         placeholder: 'Type your message...',
-                        backgroundColor: '#ffffff',
-                        textColor: '#334155',
                         sendButtonColor: '#2563eb'
                     }
                 }
