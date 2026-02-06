@@ -1,139 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neo AI | Elite Cyber Mentor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neo AI | Elite Cyber Mentor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+    html, body { height:100%; width:100%; background:#0b0f19; display:flex; justify-content:center; align-items:center; }
+    body { overflow:hidden; }
 
-    <style>
-        /* --- Global Reset & Font --- */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html, body { height:100%; width:100%; font-family: 'Inter', sans-serif; background:#0b0f19; }
+    /* --- Chat Window --- */
+    .chat-container {
+        width: 100%;
+        max-width: 420px;
+        height: 90vh;
+        background: #111827;
+        border-radius: 20px;
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
 
-        /* --- Chatbot Container --- */
-        flowise-fullchatbot { height: 100%; width: 100%; display: block; }
+    /* --- Header --- */
+    .chat-header {
+        padding: 14px 20px;
+        background: #1f2937;
+        color: #fff;
+        font-weight: 700;
+        text-align:center;
+        letter-spacing: 0.5px;
+    }
 
-        /* --- Header Styling --- */
-        flowise-fullchatbot::part(header) {
-            background: #111827 !important;
-            border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-            padding: 14px 20px !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.5px !important;
-            color: #ffffff !important;
-        }
+    /* --- Messages --- */
+    .chat-messages {
+        flex:1;
+        padding: 14px;
+        overflow-y:auto;
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+        scrollbar-width: thin;
+        scrollbar-color: #374151 transparent;
+    }
+    .chat-messages::-webkit-scrollbar { width: 6px; }
+    .chat-messages::-webkit-scrollbar-thumb { background:#374151; border-radius:3px; }
 
-        flowise-fullchatbot::part(title) {
-            font-weight: 700 !important;
-            color: #ffffff !important;
-        }
+    /* --- Message Bubbles --- */
+    .message { display:flex; gap:10px; align-items:flex-end; max-width:100%; }
+    .message.user { justify-content:flex-end; }
+    .message.bot { justify-content:flex-start; }
+    .message .avatar { width:36px; height:36px; border-radius:50%; flex-shrink:0; }
+    .message .bubble {
+        max-width: 75%;
+        padding:10px 14px;
+        border-radius:14px;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height:1.4;
+        position: relative;
+        white-space: pre-wrap;
+    }
+    .message.user .bubble { background:#3b82f6; color:#fff; border-bottom-right-radius:0; }
+    .message.bot .bubble { background:#1f2937; color:#f3f4f6; border-bottom-left-radius:0; }
 
-        /* --- Bot Avatar --- */
-        flowise-fullchatbot::part(bot-avatar) { 
-            width: 40px !important; 
-            height: 40px !important; 
-            border-radius: 12px !important; 
-        }
+    /* --- Input --- */
+    .chat-input {
+        display:flex;
+        padding:12px 14px;
+        background:#1f2937;
+        gap:10px;
+    }
+    .chat-input input {
+        flex:1;
+        padding:10px 14px;
+        border-radius:12px;
+        border:none;
+        outline:none;
+        background:#111827;
+        color:#fff;
+        font-size:14px;
+    }
+    .chat-input button {
+        background:#3b82f6;
+        border:none;
+        border-radius:12px;
+        padding:10px 16px;
+        color:#fff;
+        font-weight:600;
+        cursor:pointer;
+        transition:0.2s;
+    }
+    .chat-input button:hover { background:#2563eb; }
 
-        /* --- User Avatar --- */
-        flowise-fullchatbot::part(user-message) {
-            border-radius: 14px !important;
-            font-weight: 500 !important;
-        }
+    /* --- Footer --- */
+    .footer { text-align:center; font-size:10px; color:#6b7280; padding:6px 0; background:#111827; border-top:1px solid rgba(255,255,255,0.05); letter-spacing:1.5px; font-weight:600; }
+    .footer b { color:#3b82f6; }
 
-        flowise-fullchatbot::part(bot-message) {
-            border-radius: 14px !important;
-            font-weight: 500 !important;
-            white-space: pre-wrap;
-            animation: typingEffect 1.2s steps(30,end);
-        }
-
-        @keyframes typingEffect {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        flowise-fullchatbot::part(powered-by) { display: none !important; }
-
-        /* --- Input Field --- */
-        flowise-fullchatbot::part(text-input) {
-            border-radius: 12px !important;
-            padding: 12px 16px !important;
-            background-color: #1f2937 !important;
-            color: #ffffff !important;
-        }
-
-        flowise-fullchatbot::part(send-button) {
-            background-color: #3b82f6 !important;
-            border-radius: 12px !important;
-        }
-
-        /* --- Footer --- */
-        .custom-footer {
-            position: fixed;
-            bottom:0;
-            width:100%;
-            background:#111827;
-            text-align:center;
-            padding: 10px 0;
-            font-size:11px;
-            color:#6b7280;
-            border-top:1px solid rgba(255,255,255,0.05);
-            z-index: 999;
-            letter-spacing:1.5px;
-            font-weight:600;
-        }
-        .custom-footer b { color:#3b82f6; }
-
-        /* --- Responsive Fixes --- */
-        @media (max-width:768px) {
-            flowise-fullchatbot::part(header) { padding: 10px 14px !important; font-size: 16px !important; }
-            flowise-fullchatbot::part(bot-avatar),
-            flowise-fullchatbot::part(user-message) { width:32px !important; height:32px !important; }
-        }
-    </style>
+</style>
 </head>
 <body>
 
-    <flowise-fullchatbot></flowise-fullchatbot>
-    <div class="custom-footer">ARCHITECTED BY <b>OXACIDER</b></div>
+<div class="chat-container">
+    <div class="chat-header">NEO AI</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Ask Neo anything..." />
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+<div class="footer">ARCHITECTED BY <b>OXACIDER</b></div>
 
-    <script type="module">
-        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+<script>
+const chatMessages = document.getElementById('chatMessages');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
 
-        Chatbot.initFull({
-            chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
-            apiHost: "https://neo-nwdz.onrender.com",
-            isStreaming: true,
-            theme: {
-                chatWindow: {
-                    showTitle: true,
-                    title: 'NEO AI',
-                    titleAvatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png',
-                    welcomeMessage: 'Hi! আমি Neo।',
-                    backgroundColor: "#0b0f19",
-                    botMessage: {
-                        showAvatar: true,
-                        avatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png',
-                        backgroundColor: "#1f2937",
-                        textColor: "#f3f4f6"
-                    },
-                    userMessage: {
-                        backgroundColor: "#3b82f6",
-                        textColor: "#ffffff",
-                        showAvatar: true,
-                        avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
-                    },
-                    textInput: {
-                        placeholder: 'Ask Neo anything...',
-                        backgroundColor: '#1f2937',
-                        textColor: '#ffffff',
-                        sendButtonColor: '#3b82f6'
-                    }
-                }
-            }
-        })
-    </script>
+/* --- Append Message --- */
+function appendMessage(text, sender='bot') {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    const avatar = document.createElement('img');
+    avatar.classList.add('avatar');
+    avatar.src = sender==='bot' ? 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png' : 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return bubble;
+}
+
+/* --- Typing Simulation --- */
+async function typeText(bubble, text, speed=25){
+    bubble.textContent = '';
+    for(let i=0;i<text.length;i++){
+        bubble.textContent += text[i];
+        await new Promise(r=>setTimeout(r,speed));
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+/* --- Mock Neo Response (replace with API fetch) --- */
+async function getNeoResponse(userMsg){
+    // Demo: word-by-word response
+    if(userMsg.toLowerCase().includes('hi')) return "আসসালামু আলাইকুম, আমি NEO।\nআমি শিহাব স্যারের তৈরি একজন AI Mentor — Cybersecurity আর Tech নিয়ে গাইড করি।\nতোমার নামটা জেনে নিতে পারি?";
+    if(userMsg.toLowerCase().includes('shihab')) return "শিহাব, কেমন আছো?";
+    return "দারুণ! আজকে কি নিয়ে কথা বলতে চাও?";
+}
+
+/* --- Send Function --- */
+async function sendMessage(){
+    const msg = userInput.value.trim();
+    if(!msg) return;
+    const userBubble = appendMessage(msg, 'user');
+    userInput.value = '';
+
+    // Bot response
+    const botBubble = appendMessage('', 'bot');
+    const response = await getNeoResponse(msg); // Replace with real API call
+    await typeText(botBubble, response, 20);
+}
+
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', function(e){
+    if(e.key==='Enter') sendMessage();
+});
+</script>
+
 </body>
 </html>
