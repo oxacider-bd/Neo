@@ -7,51 +7,48 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #f8fafc; }
         
-        /* Professional Header */
+        /* --- MODERN HEADER --- */
         flowise-fullchatbot::part(header) {
             background-color: #ffffff !important;
             border-bottom: 1px solid #e2e8f0 !important;
-            padding: 12px 20px !important;
+            padding: 15px 20px !important;
+            display: flex !important;
+            align-items: center !important;
         }
         
         flowise-fullchatbot::part(title) {
-            color: #0f172a !important;
+            color: #1e293b !important;
             font-weight: 700 !important;
-            font-size: 16px !important;
+            font-size: 17px !important;
+            letter-spacing: -0.5px !important;
         }
 
-        /* --- MAGIC TYPING EFFECT START --- */
-        /* বটের মেসেজ আসার সময় এই অ্যানিমেশনটা কাজ করবে */
-        flowise-fullchatbot::part(bot-message) {
-            animation: fadeInReveal 0.8s ease-out forwards;
-            overflow: hidden;
-            display: block;
-        }
-
-        @keyframes fadeInReveal {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        /* --- MAGIC TYPING EFFECT END --- */
-
+        /* --- BOT AVATAR --- */
         flowise-fullchatbot::part(bot-avatar) { 
-            width: 38px !important; height: 38px !important; 
-            border-radius: 10px !important;
+            width: 40px !important; 
+            height: 40px !important; 
+            border-radius: 12px !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        }
+
+        /* --- STREAMING FEEL (CSS TRANSITION) --- */
+        flowise-fullchatbot::part(bot-message) {
+            animation: slideIn 0.3s ease-out;
+            line-height: 1.6 !important;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         flowise-fullchatbot::part(powered-by) { display: none !important; }
 
         .custom-footer { 
             position: fixed; bottom: 0; width: 100%; background: #fff; 
-            text-align: center; padding: 10px 0; font-size: 10px; 
-            color: #64748b; border-top: 1px solid #f1f5f9; z-index: 999; 
-            letter-spacing: 2px; font-weight: 600; text-transform: uppercase; 
+            text-align: center; padding: 12px 0; font-size: 10px; 
+            color: #94a3b8; border-top: 1px solid #f1f5f9; z-index: 999; 
+            letter-spacing: 2px; font-weight: 700; 
         }
         .custom-footer b { color: #2563eb; }
     </style>
@@ -65,11 +62,10 @@
         Chatbot.initFull({
             chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
             apiHost: "https://neo-nwdz.onrender.com",
-            chatflowConfig: {
-                vars: {
-                    streaming: true
-                }
-            },
+            
+            // এইখানে স্ট্রিমিং ট্রিক
+            isStreaming: true, 
+            
             theme: {
                 chatWindow: {
                     showTitle: true,
@@ -81,17 +77,14 @@
                     botMessage: {
                         showAvatar: true,
                         avatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png',
-                        backgroundColor: "#ffffff",
-                        textColor: "#334155"
                     },
                     userMessage: {
                         backgroundColor: "#2563eb",
-                        textColor: "#ffffff",
                         showAvatar: true,
                         avatarSrc: 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png'
                     },
                     textInput: {
-                        placeholder: 'Type your message...',
+                        placeholder: 'Ask Neo anything...',
                         sendButtonColor: '#2563eb'
                     }
                 }
