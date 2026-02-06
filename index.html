@@ -231,12 +231,10 @@
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            question: message,
                             overrideConfig: {
-                                sessionId: chatId,
-                                // Google Generative AI নোডের জন্য এই নামটাই কাজ করবে
-                                googleApiKey: activeKey
-                            }
+    sessionId: chatId,
+    googleGenerativeAIApiKey: activeKey // এই ২ নম্বর নামটা দিয়ে একবার শেষ ট্রাই কর মামা
+}
                         })
                     });
 
