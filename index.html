@@ -7,69 +7,106 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body, html { height: 100%; width: 100%; background: #0b1120; color: white; overflow: hidden; }
+        
+        /* dynamic viewport height (dvh) ব্যবহার করেছি যাতে মোবাইলে কিবোর্ড আসলে সমস্যা না হয় */
+        body, html { 
+            height: 100dvh; 
+            width: 100vw; 
+            background: #0b1120; 
+            color: white; 
+            overflow: hidden; 
+        }
 
-        /* --- Layout --- */
-        .app-container { height: 100vh; display: flex; flex-direction: column; }
+        .app-container { 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
         /* --- Header --- */
         .header { 
-            padding: 15px; background: #111827; display: flex; 
-            justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;
+            padding: 12px 16px; 
+            background: #111827; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
         }
-        .header h1 { font-size: 16px; letter-spacing: 1px; color: #3b82f6; }
+        .header h1 { font-size: 14px; letter-spacing: 1px; color: #3b82f6; font-weight: 700; }
         .reset-btn { 
             background: #ef4444; color: white; border: none; padding: 6px 12px; 
-            border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600;
+            border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;
         }
 
-        /* --- Chat Messages (Scroll Logic Fixed) --- */
+        /* --- Chat Messages Area --- */
         .chat-box { 
-            flex: 1; overflow-y: auto; padding: 20px; 
-            display: flex; flex-direction: column; gap: 15px;
-            scroll-behavior: smooth; 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px;
+            background: #0b1120;
+            scroll-behavior: smooth;
         }
 
-        .message { display: flex; gap: 10px; max-width: 85%; align-items: flex-end; }
+        .message { display: flex; gap: 10px; max-width: 90%; align-items: flex-end; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         .message.bot { align-self: flex-start; }
 
-        .avatar { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+        .avatar { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; }
         .bubble { 
-            padding: 12px 16px; border-radius: 14px; font-size: 14px; 
+            padding: 10px 14px; border-radius: 12px; font-size: 14px; 
             line-height: 1.5; word-wrap: break-word; white-space: pre-wrap;
         }
         .message.user .bubble { background: #2563eb; color: white; border-bottom-right-radius: 2px; }
         .message.bot .bubble { background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- Input Box (Sticky Fixed) --- */
+        /* --- Input Box (Mobile Fixed) --- */
         .input-container { 
-            padding: 15px; background: #111827; 
+            padding: 10px 15px; 
+            background: #111827; 
             border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; gap: 10px; align-items: center;
+            display: flex; 
+            gap: 8px; 
+            align-items: center;
+            flex-shrink: 0; /* ইনপুট বক্স যাতে চ্যাপ্টা না হয়ে যায় */
+            padding-bottom: env(safe-area-inset-bottom, 10px); /* আইফোনের নচ এর জন্য */
         }
+
         input { 
-            flex: 1; background: #1f2937; border: 1px solid rgba(255,255,255,0.2); 
-            padding: 12px; border-radius: 10px; color: white; outline: none;
+            flex: 1; 
+            background: #1f2937; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            padding: 12px; 
+            border-radius: 10px; 
+            color: white; 
+            outline: none;
+            font-size: 16px; /* ইনপুট এ ক্লিক করলে যাতে মোবাইল জুম না হয় */
         }
+
         .send-btn { 
-            background: #3b82f6; border: none; padding: 10px 18px; 
+            background: #3b82f6; border: none; padding: 10px 15px; 
             border-radius: 10px; color: white; cursor: pointer; font-weight: 600;
         }
 
-        .footer { text-align: center; font-size: 9px; color: #4b5563; padding: 5px; background: #111827; }
-
-        /* Commands inside bubble */
-        code { background: #000; padding: 2px 4px; border-radius: 4px; color: #10b981; }
+        .footer { 
+            text-align: center; 
+            font-size: 8px; 
+            color: #4b5563; 
+            padding: 4px; 
+            background: #111827;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header">
-        <h1>NEO AI</h1>
-        <button class="reset-btn" onclick="resetChat()">Reset Chat</button>
+        <h1>NEO AI MENTOR</h1>
+        <button class="reset-btn" onclick="resetChat()">Reset</button>
     </div>
 
     <div class="chat-box" id="chatbox">
@@ -87,17 +124,14 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     
-    // ইউনিক চ্যাট আইডি (যাতে এআই আগের কথা মনে রাখে)
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
     localStorage.setItem('neo_chat_id', chatId);
 
-    // ১. চ্যাট রিসেট ফাংশন
     function resetChat() {
         localStorage.removeItem('neo_chat_id');
         location.reload(); 
     }
 
-    // স্বয়ংক্রিয় স্ক্রল ফাংশন
     function scrollToBottom() {
         chatbox.scrollTop = chatbox.scrollHeight;
     }
@@ -132,7 +166,6 @@
             if (i < text.length) {
                 element.textContent += text.charAt(i);
                 i++;
-                // ৩. টাইপিং এর সাথে স্ক্রিন অটো নিচে নামবে
                 scrollToBottom();
             } else {
                 clearInterval(interval);
@@ -140,7 +173,6 @@
         }, 20);
     }
 
-    // ২. এপিআই কানেকশন উইথ মেমোরি (যাতে সিস্টেম প্রম্পট কাজ করে)
     async function fetchResponse(message) {
         try {
             const response = await fetch("https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8", {
@@ -148,26 +180,21 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     question: message,
-                    overrideConfig: {
-                        sessionId: chatId // এটি দিলে এআই আগের কথা মনে রাখবে
-                    }
+                    overrideConfig: { sessionId: chatId }
                 })
             });
             const data = await response.json();
-            // ফ্লোওয়াইস অনেক সময় সরাসরি টেক্সট দেয়, আবার কখনো অবজেক্ট। 
             return typeof data === 'string' ? data : data.text; 
         } catch (error) {
-            return "মামা, সার্ভারে একটু ঝামেলা হইছে। আবার বলো তো!";
+            return "মামা, সার্ভারে ঝামেলা! আবার ট্রাই করো।";
         }
     }
 
     async function handleSend() {
         const text = userInput.value.trim();
         if (!text) return;
-
         addMessage(text, 'user');
         userInput.value = "";
-
         const botReply = await fetchResponse(text);
         addMessage(botReply, 'bot');
     }
@@ -175,7 +202,6 @@
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
-    // ফার্স্ট ইমপ্রেশন (স্বাগতম বার্তা)
     window.onload = () => {
         addMessage("আসসালামু আলাইকুম, আমি NEO। আমি শিহাব স্যারের তৈরি একজন AI Mentor। তোমার নামটা জেনে নিতে পারি?", 'bot');
     };
