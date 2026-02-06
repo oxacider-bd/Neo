@@ -2,25 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neo AI | Elite Cyber Mentor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        /* dynamic viewport height (dvh) ব্যবহার করেছি যাতে মোবাইলে কিবোর্ড আসলে সমস্যা না হয় */
         body, html { 
-            height: 100dvh; 
-            width: 100vw; 
+            height: 100%; width: 100%; 
             background: #0b1120; 
             color: white; 
-            overflow: hidden; 
+            overflow: hidden;
+            position: fixed; /* মোবাইল বাউন্স এফেক্ট বন্ধ করার জন্য */
         }
 
         .app-container { 
             height: 100%; 
             display: flex; 
             flex-direction: column; 
+            position: relative;
         }
 
         /* --- Header --- */
@@ -33,14 +33,14 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
         }
-        .header h1 { font-size: 14px; letter-spacing: 1px; color: #3b82f6; font-weight: 700; }
+        .header h1 { font-size: 14px; color: #3b82f6; font-weight: 700; }
         .reset-btn { 
             background: #ef4444; color: white; border: none; padding: 6px 12px; 
             border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600;
         }
 
         /* --- Chat Messages Area --- */
-        .chat-box { 
+        #chatbox { 
             flex: 1; 
             overflow-y: auto; 
             padding: 15px; 
@@ -48,7 +48,7 @@
             flex-direction: column; 
             gap: 15px;
             background: #0b1120;
-            scroll-behavior: smooth;
+            padding-bottom: 80px; /* ইনপুট বক্সের জন্য জায়গা */
         }
 
         .message { display: flex; gap: 10px; max-width: 90%; align-items: flex-end; }
@@ -63,16 +63,25 @@
         .message.user .bubble { background: #2563eb; color: white; border-bottom-right-radius: 2px; }
         .message.bot .bubble { background: #1f2937; color: #e5e7eb; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- Input Box (Mobile Fixed) --- */
-        .input-container { 
-            padding: 10px 15px; 
-            background: #111827; 
+        /* --- Floating Input Container --- */
+        #input-wrapper { 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #111827;
+            padding: 12px 15px;
             border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; 
-            gap: 8px; 
+            z-index: 100;
+            transition: bottom 0.1s ease-out; /* কিবোর্ডের সাথে স্মুথলি ওঠার জন্য */
+        }
+
+        .input-content {
+            display: flex;
+            gap: 10px;
             align-items: center;
-            flex-shrink: 0; /* ইনপুট বক্স যাতে চ্যাপ্টা না হয়ে যায় */
-            padding-bottom: env(safe-area-inset-bottom, 10px); /* আইফোনের নচ এর জন্য */
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         input { 
@@ -80,52 +89,55 @@
             background: #1f2937; 
             border: 1px solid rgba(255,255,255,0.2); 
             padding: 12px; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             color: white; 
             outline: none;
-            font-size: 16px; /* ইনপুট এ ক্লিক করলে যাতে মোবাইল জুম না হয় */
+            font-size: 16px; /* জুম প্রিভেন্ট করার জন্য */
         }
 
         .send-btn { 
-            background: #3b82f6; border: none; padding: 10px 15px; 
-            border-radius: 10px; color: white; cursor: pointer; font-weight: 600;
+            background: #3b82f6; border: none; padding: 10px 18px; 
+            border-radius: 12px; color: white; cursor: pointer; font-weight: 700;
         }
 
-        .footer { 
-            text-align: center; 
-            font-size: 8px; 
-            color: #4b5563; 
-            padding: 4px; 
-            background: #111827;
-            flex-shrink: 0;
-        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header">
-        <h1>NEO AI MENTOR</h1>
+        <h1>NEO SYSTEM v9.0</h1>
         <button class="reset-btn" onclick="resetChat()">Reset</button>
     </div>
 
-    <div class="chat-box" id="chatbox">
+    <div id="chatbox">
         </div>
 
-    <div class="input-container">
-        <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
-        <button class="send-btn" id="sendBtn">Send</button>
+    <div id="input-wrapper">
+        <div class="input-content">
+            <input type="text" id="userInput" placeholder="Type a message..." autocomplete="off">
+            <button class="send-btn" id="sendBtn">Send</button>
+        </div>
     </div>
-    <div class="footer">ARCHITECTED BY <b>OXACIDER</b></div>
 </div>
 
 <script>
     const chatbox = document.getElementById('chatbox');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
+    const inputWrapper = document.getElementById('input-wrapper');
     
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
     localStorage.setItem('neo_chat_id', chatId);
+
+    // ১. কিবোর্ড ডিটেকশন ম্যাজিক (Premium Vibe)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const offset = window.innerHeight - window.visualViewport.height;
+            inputWrapper.style.bottom = `${offset}px`;
+            scrollToBottom();
+        });
+    }
 
     function resetChat() {
         localStorage.removeItem('neo_chat_id');
@@ -133,7 +145,9 @@
     }
 
     function scrollToBottom() {
-        chatbox.scrollTop = chatbox.scrollHeight;
+        setTimeout(() => {
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }, 100);
     }
 
     function addMessage(text, sender) {
@@ -186,7 +200,7 @@
             const data = await response.json();
             return typeof data === 'string' ? data : data.text; 
         } catch (error) {
-            return "মামা, সার্ভারে ঝামেলা! আবার ট্রাই করো।";
+            return "মামা, সার্ভার ডাউন! একটু পরে ট্রাই কর।";
         }
     }
 
@@ -203,7 +217,7 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        addMessage("আসসালামু আলাইকুম, আমি NEO। আমি শিহাব স্যারের তৈরি একজন AI Mentor। তোমার নামটা জেনে নিতে পারি?", 'bot');
+        addMessage("Hi! আমি NEO", 'bot');
     };
 </script>
 
