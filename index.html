@@ -4,28 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neo AI | Elite Cyber Mentor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: #0b0f19; }
-        
-        /* Professional Dark Header */
+        /* --- Global Reset & Font --- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { height:100%; width:100%; font-family: 'Inter', sans-serif; background:#0b0f19; }
+
+        /* --- Chatbot Container --- */
+        flowise-fullchatbot { height: 100%; width: 100%; display: block; }
+
+        /* --- Header Styling --- */
         flowise-fullchatbot::part(header) {
             background: #111827 !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.1) !important;
             padding: 14px 20px !important;
-        }
-        
-        flowise-fullchatbot::part(title) {
-            color: #ffffff !important;
             font-weight: 700 !important;
             letter-spacing: 0.5px !important;
+            color: #ffffff !important;
         }
 
-        /* --- Custom Typing Effect Simulation --- */
+        flowise-fullchatbot::part(title) {
+            font-weight: 700 !important;
+            color: #ffffff !important;
+        }
+
+        /* --- Bot Avatar --- */
+        flowise-fullchatbot::part(bot-avatar) { 
+            width: 40px !important; 
+            height: 40px !important; 
+            border-radius: 12px !important; 
+        }
+
+        /* --- User Avatar --- */
+        flowise-fullchatbot::part(user-message) {
+            border-radius: 14px !important;
+            font-weight: 500 !important;
+        }
+
         flowise-fullchatbot::part(bot-message) {
-            display: inline-block;
-            overflow: hidden;
+            border-radius: 14px !important;
+            font-weight: 500 !important;
             white-space: pre-wrap;
-            animation: typingEffect 1.5s steps(40, end);
+            animation: typingEffect 1.2s steps(30,end);
         }
 
         @keyframes typingEffect {
@@ -33,40 +54,63 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        flowise-fullchatbot::part(bot-avatar) { 
-            width: 38px !important; height: 38px !important; 
-            border-radius: 10px !important;
-        }
-
         flowise-fullchatbot::part(powered-by) { display: none !important; }
 
-        .custom-footer { 
-            position: fixed; bottom: 0; width: 100%; background: #111827; 
-            text-align: center; padding: 10px 0; font-size: 10px; 
-            color: #6b7280; border-top: 1px solid rgba(255, 255, 255, 0.05); 
-            z-index: 999; letter-spacing: 2px; font-weight: 600; 
+        /* --- Input Field --- */
+        flowise-fullchatbot::part(text-input) {
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
         }
-        .custom-footer b { color: #3b82f6; }
+
+        flowise-fullchatbot::part(send-button) {
+            background-color: #3b82f6 !important;
+            border-radius: 12px !important;
+        }
+
+        /* --- Footer --- */
+        .custom-footer {
+            position: fixed;
+            bottom:0;
+            width:100%;
+            background:#111827;
+            text-align:center;
+            padding: 10px 0;
+            font-size:11px;
+            color:#6b7280;
+            border-top:1px solid rgba(255,255,255,0.05);
+            z-index: 999;
+            letter-spacing:1.5px;
+            font-weight:600;
+        }
+        .custom-footer b { color:#3b82f6; }
+
+        /* --- Responsive Fixes --- */
+        @media (max-width:768px) {
+            flowise-fullchatbot::part(header) { padding: 10px 14px !important; font-size: 16px !important; }
+            flowise-fullchatbot::part(bot-avatar),
+            flowise-fullchatbot::part(user-message) { width:32px !important; height:32px !important; }
+        }
     </style>
 </head>
 <body>
+
     <flowise-fullchatbot></flowise-fullchatbot>
     <div class="custom-footer">ARCHITECTED BY <b>OXACIDER</b></div>
 
     <script type="module">
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+
         Chatbot.initFull({
             chatflowid: "c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
             apiHost: "https://neo-nwdz.onrender.com",
-            
-            // Forces the embed to look for stream chunks
-            isStreaming: true, 
-            
+            isStreaming: true,
             theme: {
                 chatWindow: {
                     showTitle: true,
                     title: 'NEO AI',
-                    titleAvatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png', 
+                    titleAvatarSrc: 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png',
                     welcomeMessage: 'Hi! আমি Neo।',
                     backgroundColor: "#0b0f19",
                     botMessage: {
