@@ -2,40 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Neo AI | Cyber Mentor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <title>Neo AI | Elite Cyber Mentor</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
     <style>
-        :root { --primary: #3b82f6; --bg-dark: #0b1120; --input-bg: #1f2937; }
+        :root { --primary: #3b82f6; --bg-dark: #0b1120; --panel: #111827; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        /* ব্রাউজারের ডিফল্ট স্ক্রল ব্লক করার জন্য */
+        /* ফুল স্ক্রিন লক এবং স্মুথনেস */
         body, html { 
             height: 100%; width: 100%; 
             background: var(--bg-dark); 
             overflow: hidden; 
-            position: fixed; /* Stop rubber-band scrolling */
         }
 
+        /* মেইন কন্টেইনার এখন dvh (Dynamic Viewport Height) ব্যবহার করবে */
         .app-container { 
             display: flex; 
             flex-direction: column; 
-            height: 100%; 
+            height: 100dvh; 
             width: 100%;
         }
 
         /* --- Header --- */
         .header { 
-            padding: 12px 20px; background: #111827; display: flex; 
-            justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10;
+            padding: 14px 20px; background: var(--panel); 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
         }
-        .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; }
-        .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+        .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
+        .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; }
 
         /* --- Professional Chat Layout --- */
         #chatbox { 
@@ -44,52 +45,59 @@
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            gap: 20px;
-            padding-bottom: 100px; /* ইনপুটের জন্য বাফার */
+            gap: 24px;
+            scroll-behavior: smooth;
+            /* স্ক্রলবার হাইড করার ট্রিক */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
         }
+        #chatbox::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
 
-        .message { display: flex; gap: 12px; max-width: 90%; }
+        .message { display: flex; gap: 14px; max-width: 90%; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
-        .avatar { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+        .avatar { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
         
         .bubble { font-size: 15px; line-height: 1.6; color: #e5e7eb; width: 100%; }
         .message.user .bubble { 
-            background: #2563eb; color: white; padding: 10px 16px; 
-            border-radius: 18px; border-bottom-right-radius: 4px; max-width: fit-content;
+            background: #2563eb; color: white; padding: 10px 18px; 
+            border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
         }
 
-        /* Markdown Styles */
-        .bubble h3 { color: white; margin: 10px 0; font-size: 16px; }
-        .bubble p { margin-bottom: 10px; }
-        .bubble ul { margin-left: 18px; margin-bottom: 10px; }
-        pre { background: #111827 !important; padding: 12px; border-radius: 8px; margin: 10px 0; overflow-x: auto; }
-        code { font-size: 13px; color: #10b981; }
+        /* Professional Markdown Elements */
+        .bubble h3 { color: white; margin-bottom: 10px; font-size: 18px; }
+        .bubble p { margin-bottom: 12px; }
+        .bubble strong { color: white; }
+        pre { background: #000 !important; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid #333; overflow-x: auto; }
+        code { font-family: 'Consolas', monospace; color: #10b981; }
 
-        /* --- MAGNET STICKY INPUT WRAPPER --- */
-        #input-wrapper { 
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #111827;
-            padding: 10px 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            z-index: 9999;
-            /* কিবোর্ডের সাথে স্মুথলি মুভ করার জন্য ট্রানজিশন */
-            transition: transform 0.1s cubic-bezier(0.2, 0, 0.2, 1);
+        /* --- Input Area (No more fixed transform, uses natural flex flow) --- */
+        .input-area {
+            background: var(--panel);
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+            /* ফোনের নিচের নচ প্রোটেকশন */
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
 
         .input-content {
-            max-width: 800px; margin: 0 auto; display: flex; gap: 10px; align-items: center;
-            background: var(--input-bg); padding: 6px 6px 6px 16px; border-radius: 25px;
+            max-width: 800px; margin: 0 auto;
+            display: flex; gap: 10px; align-items: center;
+            background: #1f2937; padding: 6px 6px 6px 16px;
+            border-radius: 26px; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; padding: 8px 0; }
+        input { 
+            flex: 1; background: transparent; border: none; 
+            color: white; outline: none; font-size: 16px; 
+            padding: 8px 0;
+        }
+
         .send-btn { 
-            background: var(--primary); border: none; width: 36px; height: 36px; 
+            background: var(--primary); border: none; width: 38px; height: 38px; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
-        .send-btn svg { width: 18px; height: 18px; fill: white; }
+        .send-btn svg { width: 20px; height: 20px; fill: white; }
     </style>
 </head>
 <body>
@@ -102,7 +110,7 @@
 
     <div id="chatbox"></div>
 
-    <div id="input-wrapper">
+    <div class="input-area">
         <div class="input-content">
             <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
             <button class="send-btn" id="sendBtn">
@@ -116,38 +124,26 @@
     const chatbox = document.getElementById('chatbox');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
-    const inputWrapper = document.getElementById('input-wrapper');
 
-    // ১. কিবোর্ড ফিক্স - "Magnet Effect"
-    if (window.visualViewport) {
-        const adjustUI = () => {
-            const viewportHeight = window.visualViewport.height;
-            const windowHeight = window.innerHeight;
-            const keyboardHeight = windowHeight - viewportHeight;
-
-            // ইনপুট বক্সকে ঠিক কিবোর্ডের ওপরের অফসেটে পাঠিয়ে দিচ্ছি
-            inputWrapper.style.transform = `translateY(-${keyboardHeight}px)`;
-            
-            // ব্রাউজারের ডিফল্ট জাম্পি স্ক্রল রিসেট করা
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            
-            scrollToBottom();
-        };
-
-        window.visualViewport.addEventListener('resize', adjustUI);
-        window.visualViewport.addEventListener('scroll', adjustUI);
+    // ১. কিবোর্ড ফিক্স - আধুনিক পদ্ধতি
+    // dvh আর interactive-widget থাকাতে ব্রাউজার নিজেই ইনপুট বক্সকে কিবোর্ডের উপরে রাখবে।
+    // আমাদের শুধু নিশ্চিত করতে হবে যে স্ক্রলটা সবসময় নিচে থাকে।
+    
+    function scrollToBottom() {
+        setTimeout(() => {
+            chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' });
+        }, 100);
     }
 
-    // ২. মার্কডাউন এবং চ্যাট লজিক (v12 থেকে আনা)
+    // কিবোর্ড ওপেন হলে অটো স্ক্রল
+    userInput.addEventListener('focus', () => {
+        setTimeout(scrollToBottom, 300);
+    });
+
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
     localStorage.setItem('neo_chat_id', chatId);
 
     function resetChat() { localStorage.removeItem('neo_chat_id'); location.reload(); }
-    
-    function scrollToBottom() { 
-        setTimeout(() => { chatbox.scrollTop = chatbox.scrollHeight; }, 100); 
-    }
 
     function addMessage(text, sender) {
         const msgDiv = document.createElement('div');
@@ -170,7 +166,9 @@
             if (i < text.length) {
                 current += text.charAt(i);
                 element.innerHTML = marked.parse(current);
-                i++; scrollToBottom();
+                i++;
+                // টাইপ করার সময় স্ক্রল ধরে রাখা
+                if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
             } else {
                 clearInterval(interval); Prism.highlightAll();
             }
@@ -186,7 +184,7 @@
             });
             const data = await res.json();
             return typeof data === 'string' ? data : data.text;
-        } catch (e) { return "**সার্ভার বিজি মামা!** আবার ট্রাই কর।"; }
+        } catch (e) { return "**Connection Error!** সার্ভার পর্যন্ত পৌঁছাতে পারছি না মামা।"; }
     }
 
     async function handleSend() {
