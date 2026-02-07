@@ -36,10 +36,41 @@
         .message { display: flex; gap: 14px; max-width: 90%; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         
-        /* Avatar & Animation */
-        .avatar { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
-        .loading-animation { animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- Gemini Style Avatar Wrapper & Glow --- */
+        .avatar-wrapper {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+        }
+
+        .loading-glow {
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #3b82f6, #10b981, #3b82f6, #8b5cf6);
+            background-size: 400% 400%;
+            z-index: 0;
+            filter: blur(5px);
+            display: none;
+            animation: geminiGradient 3s ease infinite;
+        }
+
+        @keyframes geminiGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loading-animation .loading-glow { display: block; }
+
+        .avatar { 
+            width: 34px; height: 34px; 
+            border-radius: 10px; 
+            position: relative; 
+            z-index: 1; 
+            background: var(--bg-dark);
+        }
         
         .bubble { font-size: 15px; line-height: 1.6; color: #e5e7eb; width: 100%; }
         .message.user .bubble { 
@@ -47,7 +78,7 @@
             border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
         }
 
-        /* Code Block Styling with Copy Button */
+        /* Code Block Copy Button & Wrap */
         .code-container { position: relative; margin: 15px 0; }
         .copy-btn {
             position: absolute; right: 10px; top: 10px;
@@ -122,16 +153,25 @@
 
     function addMessage(text, sender, isLoading = false) {
         const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${sender}`;
+        msgDiv.className = `message ${sender} ${isLoading ? 'loading-animation' : ''}`;
+        
+        const avatarWrapper = document.createElement('div');
+        avatarWrapper.className = 'avatar-wrapper';
+        
+        const glow = document.createElement('div');
+        glow.className = 'loading-glow';
         
         const img = document.createElement('img');
-        img.className = `avatar ${isLoading ? 'loading-animation' : ''}`;
+        img.className = 'avatar';
         img.src = sender === 'bot' ? 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png' : 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+        
+        avatarWrapper.appendChild(glow);
+        avatarWrapper.appendChild(img);
         
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
         
-        msgDiv.appendChild(img); 
+        msgDiv.appendChild(avatarWrapper); 
         msgDiv.appendChild(bubble);
         chatbox.appendChild(msgDiv);
         
@@ -139,17 +179,17 @@
             if (isLoading) {
                 bubble.textContent = "Neo is thinking...";
             } else {
-                renderMarkdown(bubble, text, img);
+                renderMarkdown(bubble, text, msgDiv);
             }
         } else {
             bubble.textContent = text;
         }
         
         scrollToBottom();
-        return { bubble, img };
+        return { bubble, msgDiv };
     }
 
-    function renderMarkdown(element, text, avatarImg) {
+    function renderMarkdown(element, text, parentMsgDiv) {
         let i = 0; let current = "";
         const interval = setInterval(() => {
             if (i < text.length) {
@@ -159,7 +199,7 @@
                 if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
             } else {
                 clearInterval(interval);
-                if(avatarImg) avatarImg.classList.remove('loading-animation');
+                if(parentMsgDiv) parentMsgDiv.classList.remove('loading-animation');
                 addCopyButtons(element);
                 Prism.highlightAll();
             }
@@ -197,7 +237,6 @@
         addMessage(text, 'user');
         userInput.value = "";
 
-        // ১. লোগোসহ লোডিং স্টেট দেখানো (লোগো আসবে এবং ঘুরবে)
         const botObj = addMessage("", 'bot', true); 
 
         try {
@@ -209,12 +248,11 @@
             const data = await res.json();
             const reply = data.text || (typeof data === 'string' ? data : "Error!");
             
-            // ২. রেসপন্স আসলে লোডিং টেক্সট সরিয়ে আসল উত্তর রেন্ডার করা
             botObj.bubble.textContent = ""; 
-            renderMarkdown(botObj.bubble, reply, botObj.img);
+            renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
             
         } catch (e) {
-            botObj.img.classList.remove('loading-animation');
+            botObj.msgDiv.classList.remove('loading-animation');
             botObj.bubble.textContent = "Connection Error মামা! সার্ভারে জ্যাম।";
         }
     }
