@@ -589,8 +589,18 @@
 
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+    
+    // ইনপুট বক্সে ফোকাস করলে এবং কিবোর্ড উঠলে অটো নিচে স্ক্রল হবে
     userInput.addEventListener('focus', () => {
-        setTimeout(scrollToBottom, 100);
+        // অল্প একটু ডিলে দেওয়া হয়েছে যাতে কিবোর্ড ওঠার সময় পায়
+        setTimeout(() => {
+            scrollToBottom();
+        }, 300);
+    });
+
+    // বিশেষ করে আইফোনের জন্য বা ভিউপোর্ট সাইজ চেঞ্জ হলে
+    window.visualViewport.addEventListener('resize', () => {
+        scrollToBottom();
     });
 
     window.onload = () => {
