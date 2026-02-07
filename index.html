@@ -14,14 +14,12 @@
         :root { --primary: #3b82f6; --bg-dark: #0b1120; --panel: #111827; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        /* ফুল স্ক্রিন লক এবং স্মুথনেস */
         body, html { 
             height: 100%; width: 100%; 
             background: var(--bg-dark); 
             overflow: hidden; 
         }
 
-        /* মেইন কন্টেইনার এখন dvh (Dynamic Viewport Height) ব্যবহার করবে */
         .app-container { 
             display: flex; 
             flex-direction: column; 
@@ -29,7 +27,6 @@
             width: 100%;
         }
 
-        /* --- Header --- */
         .header { 
             padding: 14px 20px; background: var(--panel); 
             display: flex; justify-content: space-between; align-items: center;
@@ -38,7 +35,6 @@
         .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
         .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; }
 
-        /* --- Professional Chat Layout --- */
         #chatbox { 
             flex: 1; 
             overflow-y: auto; 
@@ -47,11 +43,10 @@
             flex-direction: column; 
             gap: 24px;
             scroll-behavior: smooth;
-            /* স্ক্রলবার হাইড করার ট্রিক */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
         }
-        #chatbox::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+        #chatbox::-webkit-scrollbar { display: none; }
 
         .message { display: flex; gap: 14px; max-width: 90%; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
@@ -63,20 +58,17 @@
             border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
         }
 
-        /* Professional Markdown Elements */
         .bubble h3 { color: white; margin-bottom: 10px; font-size: 18px; }
         .bubble p { margin-bottom: 12px; }
         .bubble strong { color: white; }
         pre { background: #000 !important; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid #333; overflow-x: auto; }
         code { font-family: 'Consolas', monospace; color: #10b981; }
 
-        /* --- Input Area (No more fixed transform, uses natural flex flow) --- */
         .input-area {
             background: var(--panel);
             padding: 12px 16px;
             border-top: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
-            /* ফোনের নিচের নচ প্রোটেকশন */
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
 
@@ -125,17 +117,24 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // ১. কিবোর্ড ফিক্স - আধুনিক পদ্ধতি
-    // dvh আর interactive-widget থাকাতে ব্রাউজার নিজেই ইনপুট বক্সকে কিবোর্ডের উপরে রাখবে।
-    // আমাদের শুধু নিশ্চিত করতে হবে যে স্ক্রলটা সবসময় নিচে থাকে।
-    
+    // --- ৪টি এপিআই এন্ডপয়েন্ট রোটেশন (The Core Change) ---
+    const flowEndpoints = [
+        "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/598700f9-93ef-4580-b745-e8623e7c5cc4",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/1a1755be-90f1-4a2a-9bc4-fa8f2ca11561"
+    ];
+
+    // র্যান্ডমলি একটি এন্ডপয়েন্ট সিলেক্ট করা (প্রতি পেজ লোডে বা সেশনে একবার সেট হবে)
+    const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
+    console.log("NEO is running on:", selectedEndpoint);
+
     function scrollToBottom() {
         setTimeout(() => {
             chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' });
         }, 100);
     }
 
-    // কিবোর্ড ওপেন হলে অটো স্ক্রল
     userInput.addEventListener('focus', () => {
         setTimeout(scrollToBottom, 300);
     });
@@ -167,7 +166,6 @@
                 current += text.charAt(i);
                 element.innerHTML = marked.parse(current);
                 i++;
-                // টাইপ করার সময় স্ক্রল ধরে রাখা
                 if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
             } else {
                 clearInterval(interval); Prism.highlightAll();
@@ -177,14 +175,15 @@
 
     async function fetchResponse(message) {
         try {
-            const res = await fetch("https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8", {
+            // এখন আর একটা এন্ডপয়েন্ট না, বরং selectedEndpoint ব্যবহার হবে
+            const res = await fetch(selectedEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ question: message, overrideConfig: { sessionId: chatId } })
             });
             const data = await res.json();
-            return typeof data === 'string' ? data : data.text;
-        } catch (e) { return "**Connection Error!** সার্ভার পর্যন্ত পৌঁছাতে পারছি না মামা।"; }
+            return data.text || (typeof data === 'string' ? data : "মামা, কোনো রেসপন্স আসলো না।");
+        } catch (e) { return "**Connection Error!** সার্ভারে একটু জ্যাম মামা। আবার ট্রাই কর!"; }
     }
 
     async function handleSend() {
@@ -200,7 +199,7 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        addMessage("Hi! আমি Neo", 'bot');
+        addMessage("সালাম মামা! আমি NEO। সাইবার সিকিউরিটি নিয়ে কি জানতে চাস বল। তোর নাম কী?", 'bot');
     };
 </script>
 
