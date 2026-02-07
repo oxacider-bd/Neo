@@ -62,7 +62,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        .loading-animation .loading-glow { display: block; }
+        .loading-animation .loading-glow { display: block !important; }
 
         .avatar { 
             width: 34px; height: 34px; 
@@ -78,7 +78,7 @@
             border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
         }
 
-        /* Code Block Copy Button & Wrap */
+        /* Code Block Styling */
         .code-container { position: relative; margin: 15px 0; }
         .copy-btn {
             position: absolute; right: 10px; top: 10px;
@@ -86,7 +86,6 @@
             border: 1px solid rgba(255,255,255,0.2); padding: 4px 8px;
             border-radius: 6px; font-size: 10px; cursor: pointer; z-index: 10;
         }
-        .copy-btn:hover { background: var(--primary); color: white; }
 
         pre { 
             background: #000 !important; padding: 15px; border-radius: 12px; 
@@ -107,7 +106,6 @@
         }
         input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; padding: 8px 0; }
         .send-btn { background: var(--primary); border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .send-btn svg { width: 20px; height: 20px; fill: white; }
     </style>
 </head>
 <body>
@@ -122,7 +120,7 @@
         <div class="input-content">
             <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
             <button class="send-btn" id="sendBtn">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
         </div>
     </div>
@@ -143,7 +141,7 @@
     const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
 
     function scrollToBottom() {
-        setTimeout(() => { chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' }); }, 100);
+        setTimeout(() => { chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' }); }, 50);
     }
 
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
@@ -151,9 +149,10 @@
 
     function resetChat() { localStorage.removeItem('neo_chat_id'); location.reload(); }
 
-    function addMessage(text, sender, isLoading = false) {
+    // মেইন মেসেজ ফাংশন - লোগো ইনজেক্ট করার জন্য
+    function createBotMessageElement(isLoading = false) {
         const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${sender} ${isLoading ? 'loading-animation' : ''}`;
+        msgDiv.className = `message bot ${isLoading ? 'loading-animation' : ''}`;
         
         const avatarWrapper = document.createElement('div');
         avatarWrapper.className = 'avatar-wrapper';
@@ -163,30 +162,35 @@
         
         const img = document.createElement('img');
         img.className = 'avatar';
-        img.src = sender === 'bot' ? 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png' : 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+        img.src = 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png';
         
         avatarWrapper.appendChild(glow);
         avatarWrapper.appendChild(img);
         
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
+        if(isLoading) bubble.textContent = "Neo is thinking...";
         
         msgDiv.appendChild(avatarWrapper); 
         msgDiv.appendChild(bubble);
         chatbox.appendChild(msgDiv);
-        
-        if (sender === 'bot') {
-            if (isLoading) {
-                bubble.textContent = "Neo is thinking...";
-            } else {
-                renderMarkdown(bubble, text, msgDiv);
-            }
-        } else {
-            bubble.textContent = text;
-        }
-        
         scrollToBottom();
-        return { bubble, msgDiv };
+        
+        return { msgDiv, bubble, img };
+    }
+
+    function addUserMessage(text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message user';
+        const img = document.createElement('img');
+        img.className = 'avatar';
+        img.src = 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+        msgDiv.appendChild(img); msgDiv.appendChild(bubble);
+        chatbox.appendChild(msgDiv);
+        scrollToBottom();
     }
 
     function renderMarkdown(element, text, parentMsgDiv) {
@@ -199,7 +203,7 @@
                 if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
             } else {
                 clearInterval(interval);
-                if(parentMsgDiv) parentMsgDiv.classList.remove('loading-animation');
+                parentMsgDiv.classList.remove('loading-animation');
                 addCopyButtons(element);
                 Prism.highlightAll();
             }
@@ -214,15 +218,12 @@
             wrapper.className = 'code-container';
             pre.parentNode.insertBefore(wrapper, pre);
             wrapper.appendChild(pre);
-
             const button = document.createElement('button');
             button.className = 'copy-btn';
             button.innerText = 'Copy';
             wrapper.appendChild(button);
-
             button.addEventListener('click', () => {
-                const code = pre.innerText;
-                navigator.clipboard.writeText(code).then(() => {
+                navigator.clipboard.writeText(pre.innerText).then(() => {
                     button.innerText = 'Copied!';
                     setTimeout(() => { button.innerText = 'Copy'; }, 2000);
                 });
@@ -234,10 +235,11 @@
         const text = userInput.value.trim();
         if (!text) return;
 
-        addMessage(text, 'user');
+        addUserMessage(text);
         userInput.value = "";
 
-        const botObj = addMessage("", 'bot', true); 
+        // ১. বটের জন্য লোগোসহ লোডিং মেসেজ সাথে সাথে তৈরি করা
+        const botObj = createBotMessageElement(true); 
 
         try {
             const res = await fetch(selectedEndpoint, {
@@ -248,12 +250,13 @@
             const data = await res.json();
             const reply = data.text || (typeof data === 'string' ? data : "Error!");
             
+            // ২. উত্তর চলে আসলে লোডিং টেক্সট মুছে টাইপিং শুরু
             botObj.bubble.textContent = ""; 
             renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
             
         } catch (e) {
             botObj.msgDiv.classList.remove('loading-animation');
-            botObj.bubble.textContent = "Connection Error মামা! সার্ভারে জ্যাম।";
+            botObj.bubble.textContent = "Error! কানেকশনে সমস্যা মামা।";
         }
     }
 
@@ -261,7 +264,8 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        addMessage("সালাম মামা! আমি NEO। কী জানতে চাস বল।", 'bot');
+        const botObj = createBotMessageElement(false);
+        botObj.bubble.textContent = "সালাম মামা! আমি NEO। কী জানতে চাস বল।";
     };
 </script>
 
