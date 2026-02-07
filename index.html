@@ -33,7 +33,7 @@
         }
         #chatbox::-webkit-scrollbar { display: none; }
 
-        .message { display: flex; gap: 14px; max-width: 90%; position: relative; }
+        .message { display: flex; gap: 14px; max-width: 90%; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         
         /* Avatar & Animation */
@@ -131,14 +131,20 @@
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
         
-        msgDiv.appendChild(img); msgDiv.appendChild(bubble);
+        msgDiv.appendChild(img); 
+        msgDiv.appendChild(bubble);
         chatbox.appendChild(msgDiv);
         
-        if(sender === 'bot' && !isLoading) {
-            renderMarkdown(bubble, text, img);
+        if (sender === 'bot') {
+            if (isLoading) {
+                bubble.textContent = "Neo is thinking...";
+            } else {
+                renderMarkdown(bubble, text, img);
+            }
         } else {
             bubble.textContent = text;
         }
+        
         scrollToBottom();
         return { bubble, img };
     }
@@ -191,8 +197,8 @@
         addMessage(text, 'user');
         userInput.value = "";
 
-        // লোডিং মেসেজ তৈরি
-        const { bubble, img } = addMessage("Neo is thinking...", 'bot', true);
+        // ১. লোগোসহ লোডিং স্টেট দেখানো (লোগো আসবে এবং ঘুরবে)
+        const botObj = addMessage("", 'bot', true); 
 
         try {
             const res = await fetch(selectedEndpoint, {
@@ -203,11 +209,13 @@
             const data = await res.json();
             const reply = data.text || (typeof data === 'string' ? data : "Error!");
             
-            bubble.textContent = ""; // লোডিং টেক্সট মোছা
-            renderMarkdown(bubble, reply, img);
+            // ২. রেসপন্স আসলে লোডিং টেক্সট সরিয়ে আসল উত্তর রেন্ডার করা
+            botObj.bubble.textContent = ""; 
+            renderMarkdown(botObj.bubble, reply, botObj.img);
+            
         } catch (e) {
-            img.classList.remove('loading-animation');
-            bubble.textContent = "Connection Error মামা!";
+            botObj.img.classList.remove('loading-animation');
+            botObj.bubble.textContent = "Connection Error মামা! সার্ভারে জ্যাম।";
         }
     }
 
@@ -215,7 +223,7 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        addMessage("Hi! আমি NEO", 'bot');
+        addMessage("সালাম মামা! আমি NEO। কী জানতে চাস বল।", 'bot');
     };
 </script>
 
