@@ -1,54 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
     <title>Neo AI | Elite Cyber Mentor</title>
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
     <style>
-        :root {
-            --primary: #3b82f6;
-            --bg-dark: #0b1120;
-            --panel: #111827;
-        }
+        :root { --primary: #3b82f6; --bg-dark: #0b1120; --panel: #111827; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body, html { height: 100%; width: 100%; background: var(--bg-dark); overflow: hidden; }
+        .app-container { display: flex; flex-direction: column; height: 100dvh; width: 100%; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body,
-        html {
-            height: 100%;
-            width: 100%;
-            background: var(--bg-dark);
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100dvh;
-            width: 100%;
-        }
-
-        .header {
-            padding: 14px 20px;
-            background: var(--panel);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            flex-shrink: 0;
+        .header { 
+            padding: 14px 20px; background: var(--panel); 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
         }
 
         .logo-container {
@@ -57,7 +29,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 255, 65, 0.05);
+            background: rgba(0,255,65,0.05);
             border-radius: 6px;
             margin-right: 12px;
             flex-shrink: 0;
@@ -66,277 +38,155 @@
         .logo-container svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 0 3px #00FF41) drop-shadow(0 0 8px rgba(0, 255, 65, 0.3));
+            filter: drop-shadow(0 0 3px #00FF41) drop-shadow(0 0 8px rgba(0,255,65,0.3));
         }
 
-        .header h1 {
-            font-size: 15px;
-            color: var(--primary);
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+        .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
+        .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
 
-        .reset-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
+        #chatbox { 
+            flex: 1; overflow-y: auto; padding: 15px; 
+            display: flex; flex-direction: column; gap: 20px;
+            scroll-behavior: smooth; scrollbar-width: none; 
         }
+        #chatbox::-webkit-scrollbar { display: none; }
 
-        #chatbox {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-        }
-
-        #chatbox::-webkit-scrollbar {
-            display: none;
-        }
-
-        .message {
-            display: flex;
-            gap: 12px;
-            max-width: 95%;
-            align-items: flex-start;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        /* --- Stylish Neo Animation --- */
+        .message { display: flex; gap: 12px; max-width: 95%; align-items: flex-start; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        
+        /* --- Avatar & Gemini Style Glow Effect --- */
         .avatar-wrapper {
-            position: relative;
-            width: 44px;
-            height: 44px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative; width: 40px; height: 40px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .loading-glow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent, #3b82f6, #00FF41, #8b5cf6, #3b82f6);
-            z-index: 0;
-            display: none;
-            animation: rotateGlow 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            filter: blur(4px);
-            opacity: 0.8;
+            /* Gemini Style Gradient */
+            background: conic-gradient(from 0deg, transparent, #3b82f6, #10b981, #8b5cf6, transparent);
+            z-index: 0; display: none;
+            animation: rotateGlow 1.2s linear infinite;
+            filter: blur(2px);
         }
 
         @keyframes rotateGlow {
-            0% {
-                transform: rotate(0deg);
-                filter: blur(4px);
-            }
-
-            50% {
-                filter: blur(6px);
-                opacity: 1;
-            }
-
-            100% {
-                transform: rotate(360deg);
-                filter: blur(4px);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .loading-animation .loading-glow {
-            display: block !important;
-        }
+        .loading-animation .loading-glow { display: block !important; }
 
-        .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            position: relative;
-            z-index: 1;
-            background: #111827;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .avatar { 
+            width: 32px; height: 32px; border-radius: 50%; 
+            position: relative; z-index: 1; 
+            background: var(--bg-dark); 
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-
-        .avatar svg,
-        .avatar img {
-            width: 100%;
-            height: 100%;
+        
+        .avatar svg, .avatar img { 
+            width: 100%; 
+            height: 100%; 
             object-fit: cover;
+            filter: saturate(1.3) brightness(1.1);
         }
-
-        /* User avatar - Simplified */
+                /* User avatar styling */
         .message.user .avatar {
-            background: #2563eb;
-            border: none;
-            padding: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: 2px solid #2563eb;
+            flex-shrink: 0;
         }
 
-        .loading-animation .avatar {
-            transform: scale(0.85);
-            transition: 0.4s;
+        .message.user .avatar img {
+            padding: 4px;
         }
+                /* লোডিং অবস্থায় আইকন একটু ছোট হবে */
+        .loading-animation .avatar { width: 28px; height: 28px; transition: 0.3s; }
 
-        /* --- Bubble Styling --- */
-        .bubble {
-            width: 100%;
-            overflow-wrap: break-word;
+        .bubble { 
+            font-size: 16px; 
+            font-weight: 500; 
+            line-height: 1.8; 
+            color: #e5e7eb; 
+            width: 100%; 
+            overflow-wrap: break-word; 
         }
-
-        /* User: Normal Weight */
-        .message.user .bubble {
-            background: #2563eb;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 20px;
-            border-bottom-right-radius: 4px;
+        .message.user .bubble { 
+            background: #2563eb; 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 18px; 
+            border-bottom-right-radius: 4px; 
             max-width: fit-content;
-            font-size: 15px;
-            font-weight: 400;
-            /* No bold */
-        }
-
-        /* Bot: Gemini/ChatGPT Style */
-        .message.bot .bubble {
-            font-size: 16px;
             font-weight: 500;
-            line-height: 1.7;
-            color: #f3f4f6;
+            font-size: 16px;
         }
-
-        .message.bot .bubble p {
-            margin-bottom: 10px;
+        .message.bot .bubble {
+            font-weight: 500;
         }
 
         /* --- Code Block --- */
-        .code-container {
-            position: relative;
-            margin: 15px 0;
-            width: 100%;
-        }
-
+        .code-container { position: relative; margin: 15px 0; width: 100%; }
         .copy-btn {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ccc;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            cursor: pointer;
-            z-index: 10;
+            position: absolute; right: 10px; top: 10px;
+            background: rgba(255,255,255,0.1); color: #ccc;
+            border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px;
+            border-radius: 6px; font-size: 10px; cursor: pointer; z-index: 10;
         }
-
-        pre {
-            background: #000 !important;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            width: 100% !important;
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
+        pre { 
+            background: #000 !important; padding: 15px; border-radius: 12px; 
+            border: 1px solid #333; width: 100% !important; 
+            white-space: pre-wrap !important; word-wrap: break-word !important;
+            overflow-x: hidden; display: block;
         }
-
-        code {
-            font-family: 'Consolas', monospace;
-            color: #10b981;
-            font-size: 13px;
-        }
+        code { font-family: 'Consolas', monospace; color: #10b981; font-size: 13px; }
 
         .input-area {
-            background: var(--panel);
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            flex-shrink: 0;
+            background: var(--panel); padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
-
         .input-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: #1f2937;
-            padding: 6px 6px 6px 16px;
-            border-radius: 26px;
+            max-width: 800px; margin: 0 auto; display: flex; gap: 10px; align-items: center;
+            background: #1f2937; padding: 6px 6px 6px 16px; border-radius: 26px;
         }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 16px;
-            padding: 8px 0;
-        }
-
-        .send-btn {
-            background: var(--primary);
-            border: none;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; padding: 8px 0; }
+        .send-btn { background: var(--primary); border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
-
 <body>
 
-    <div class="app-container">
-        <div class="header">
-            <div style="display: flex; align-items: center;">
-                <div class="logo-container" id="headerLogo"></div>
-                <h1>NEO SYSTEM</h1>
-            </div>
-            <button class="reset-btn" onclick="location.reload()">Reset</button>
+<div class="app-container">
+    <div class="header">
+        <div style="display: flex; align-items: center; flex: 1;">
+            <div class="logo-container" id="headerLogo"></div>
+            <h1>NEO SYSTEM</h1>
         </div>
-        <div id="chatbox"></div>
-        <div class="input-area">
-            <div class="input-content">
-                <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
-                <button class="send-btn" id="sendBtn">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                    </svg>
-                </button>
-            </div>
+        <button class="reset-btn" onclick="location.reload()">Reset</button>
+    </div>
+    <div id="chatbox"></div>
+    <div class="input-area">
+        <div class="input-content">
+            <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
+            <button class="send-btn" id="sendBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
         </div>
     </div>
+</div>
 
-    <script>
-        const chatbox = document.getElementById('chatbox');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
+<script>
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-        // 👇 তোমার ২৪৭ লাইনের SVG কোডটা এখানে থাকবে (সংক্ষেপিত রাখা হলো) 👇
-        const NEO_SVG_CODE = `<?xml version="1.0" encoding="UTF-8"?>
+    // 👇 এখানে তোমার সেই ২৪৭ লাইনের SVG কোডটা পেস্ট করো 👇
+    const NEO_SVG_CODE = `
+    <?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="800" height="800">
-<path d="M0 0 C264 0 528 0 800 0 C800 264 800 528 800 800 C536 800 272 800 0 800 C0 536 0 272 0 0 Z " fill="#000000" transform="translate(0,0)"/>
 <path d="M0 0 C0.74491699 0.31936523 1.48983398 0.63873047 2.25732422 0.96777344 C22.59743701 9.83086174 40.98035978 21.81275162 58 36 C58.54156738 36.45133301 59.08313477 36.90266602 59.64111328 37.36767578 C69.84586145 45.90496303 79.46327872 54.75927565 88 65 C88.42651855 65.50740723 88.85303711 66.01481445 89.29248047 66.53759766 C116.51496447 99.0868293 133.8986436 137.46025817 142 179 C142.24991699 180.24088379 142.24991699 180.24088379 142.50488281 181.50683594 C148.03020743 210.25453936 147.51952986 243.48647814 141 272 C140.76925781 273.0410791 140.53851562 274.0821582 140.30078125 275.15478516 C128.41886642 327.29533074 98.41915717 376.99543509 56 410 C55.06196533 410.74467529 55.06196533 410.74467529 54.10498047 411.50439453 C44.47425697 419.14968613 34.75793782 426.04358481 24 432 C23.24831543 432.42490723 22.49663086 432.84981445 21.72216797 433.28759766 C-14.40317669 453.59759823 -53.20388637 463.16046111 -94.45996094 463.24023438 C-97.46578181 463.24989008 -100.47090261 463.28097554 -103.4765625 463.3125 C-120.5301679 463.40556185 -136.76962417 461.46819944 -153.2421875 457.01171875 C-155.63233102 456.36821857 -158.0331253 455.76221719 -160.4453125 455.20703125 C-218.73742838 441.31864123 -270.8200918 399.3292809 -301.87060547 348.86376953 C-310.3048957 334.94518509 -318.35290482 320.43656124 -323.11328125 304.80859375 C-323.78426485 302.6833197 -324.5599137 300.59072568 -325.3828125 298.51953125 C-327.6339689 292.58059299 -329.04276536 286.40737649 -330.5625 280.25 C-330.86607422 279.05117188 -331.16964844 277.85234375 -331.48242188 276.6171875 C-346.4800303 216.36535757 -334.80182023 150.22402244 -303.31787109 97.15380859 C-295.17736738 83.84971008 -285.61382224 71.8299051 -275.1015625 60.32421875 C-273.26615163 58.29434985 -271.50618556 56.2229064 -269.75 54.125 C-247.49283836 28.69555326 -215.5178523 8.44849777 -184 -3 C-182.68358533 -3.51226996 -181.36851513 -4.02800597 -180.0546875 -4.546875 C-122.81383322 -26.97854102 -56.11330764 -24.09773948 0 0 Z " fill="#11161D" transform="translate(496,178)"/>
 <path d="M0 0 C7.17008133 -0.4667684 12.2932795 -0.65854735 18 4 C21.11308122 8.35460766 22.8216639 12.60049439 22 18 C20.74833475 20.98015535 19.48777032 23.41423876 17.41894531 25.89868164 C14.87628824 29.66410652 15.52751935 33.6235351 16 38 C16.84892532 42.09970487 18.01259851 46.06493558 19.25 50.0625 C19.70052734 51.59874023 19.70052734 51.59874023 20.16015625 53.16601562 C23.8254716 65.41961273 23.8254716 65.41961273 30.9375 75.875 C31.58589844 76.59429687 32.23429688 77.31359375 32.90234375 78.0546875 C40.01458081 84.65039338 48.17261026 85.7104328 57.5546875 85.4453125 C68.75353498 84.65708021 79.12615577 79.60571613 88 73 C89.78428305 71.86332571 91.57646212 70.73898203 93.375 69.625 C98.32035474 66.50455081 103.01711814 63.11792559 107.6875 59.6015625 C110 58 110 58 113 57 C112.95359375 56.20335937 112.9071875 55.40671875 112.859375 54.5859375 C112.49438701 43.87093296 112.49438701 43.87093296 117 39 C117.721875 38.21625 118.44375 37.4325 119.1875 36.625 C123.17871855 34.31896261 126.49563559 34.35424156 131 35 C136.67476113 36.96434039 140.31400331 40.62800662 143 46 C143.58649535 51.86495346 142.59400261 56.34596853 139 61 C133.993156 64.95452059 129.1976173 65.50800142 123 65 C122.20335937 64.76796875 121.40671875 64.5359375 120.5859375 64.296875 C114.64814016 63.61519434 108.91758383 69.54008723 104.4140625 72.96875 C102.75520129 74.28746617 101.10804982 75.62104056 99.47265625 76.96875 C97.81554604 78.33004117 96.13515318 79.66344414 94.43359375 80.96875 C84.87553546 88.32334752 75.90309089 97.29072734 72 109 C70.54170815 120.86177596 72.82468106 128.56492152 80 138 C88.0852301 146.95150476 99.47445761 154.29930668 111 158 C114.08978257 157.64348663 115.32216095 156.78522603 118 155 C124.76925357 153.98224509 129.52215361 154.9754598 135 159 C138.95632067 163.17093241 138.60587876 167.28054735 138.48828125 172.7890625 C137.77134506 177.50363487 135.77871357 180.18329837 132 183 C127.31777181 185.89571764 122.33353835 185.62700823 117 185 C112.5639613 182.64040495 109.79023207 178.65986876 108 174 C107.9175 172.8346875 107.835 171.669375 107.75 170.46875 C107.36468534 166.8488104 107.36468534 166.8488104 104.515625 165.14453125 C101.02286472 163.71985272 97.53722727 162.31134387 94 161 C92.9584375 160.58363281 91.916875 160.16726563 90.84375 159.73828125 C81.38231247 156.33359729 69.58507907 154.98477592 59.75 157.875 C57.93329173 158.72618105 57.93329173 158.72618105 56 160 C54.97261719 160.63808594 53.94523438 161.27617187 52.88671875 161.93359375 C42.93305492 168.57742967 37.44599172 176.77226735 34.953125 188.546875 C32.28204651 203.48474425 32.28707369 218.87074076 32 234 C32.90878906 234.19335938 32.90878906 234.19335938 33.8359375 234.390625 C37.73293954 235.48797575 40.29181123 237.7859621 42.3125 241.25 C43.67592902 246.70371606 43.86535604 250.41848725 41.1875 255.3125 C36.01375246 261.66881841 36.01375246 261.66881841 30.51171875 262.2734375 C21.94839993 262.58138534 21.94839993 262.58138534 18.4375 259.6875 C13.66671581 254.42740461 13.51341798 251.02298609 13.61328125 244.109375 C14 241 14 241 16.25 237.875 C19 236 19 236 21.14306641 234.8215332 C23.3128167 233.05673417 23.3128167 233.05673417 23.48583984 229.85229492 C23.47762207 228.57459229 23.4694043 227.29688965 23.4609375 225.98046875 C23.46002106 225.28544754 23.45910461 224.59042633 23.4581604 223.87434387 C23.45211586 222.39736132 23.43634393 220.92039151 23.41162109 219.44360352 C23.37574507 217.23340148 23.37059774 215.02491218 23.37109375 212.81445312 C23.30058916 198.68116237 23.03342036 183.61439761 14 172 C8.19862903 166.45086255 2.97608843 164.45709977 -4.953125 164.61328125 C-14.50058898 165.82507476 -23.54811359 169.53993797 -32 174 C-32.75925781 174.38720215 -33.51851563 174.7744043 -34.30078125 175.17333984 C-44.41625579 179.86064361 -44.41625579 179.86064361 -51.24609375 187.953125 C-51.43155566 190.79467417 -51.43155566 190.79467417 -51.16796875 193.5546875 C-51 196 -51 196 -52.6875 199.4375 C-56.6935132 203.8765957 -59.90568764 206.22226898 -65.9375 206.625 C-70.7233373 206.43010165 -73.32373001 205.00849082 -76.66015625 201.6328125 C-80.05770207 197.49236307 -80.44161763 193.42705798 -80.3203125 188.2109375 C-79.817218 184.73835836 -78.21967992 182.65128435 -76 180 C-75.41605469 179.29101562 -74.83210938 178.58203125 -74.23046875 177.8515625 C-71.34234721 175.45406756 -69.76770127 175.55200084 -66.0625 175.6875 C-65.04285156 175.71199219 -64.02320313 175.73648438 -62.97265625 175.76171875 C-60 176 -60 176 -57.58984375 176.78125 C-53.52399818 177.12466984 -50.77699967 174.95803261 -47.5 172.8125 C-46.8002002 172.36342285 -46.10040039 171.9143457 -45.37939453 171.45166016 C-35.69033463 165.04136582 -26.11542766 157.00293 -20 147 C-19.63003906 146.41476562 -19.26007813 145.82953125 -18.87890625 145.2265625 C-16.2821393 138.64808622 -17.1926351 129.10251344 -19.5625 122.5625 C-24.07639629 113.09585639 -31.19029779 108.21761718 -40 103 C-41.07121094 102.31550781 -42.14242187 101.63101563 -43.24609375 100.92578125 C-49.64980649 96.84520576 -55.85215734 93.54201447 -63 91 C-64.26457031 90.44505859 -64.26457031 90.44505859 -65.5546875 89.87890625 C-69.83081601 88.3419591 -73.80762491 89.60254164 -78 91 C-82.9387324 91.65849765 -86.08507893 91.57606141 -90.375 88.875 C-95.45608568 83.3100014 -96.53433397 78.96013332 -96.2734375 71.5546875 C-95.91143285 68.17252981 -95.38936424 66.46403187 -93 64 C-88.23183078 60.7567858 -83.8115871 58.98042332 -78 60 C-73.28821069 62.41032127 -68.85056298 64.81842366 -67 70 C-66.93403637 71.49869371 -66.91438408 73.00003344 -66.9375 74.5 C-66.79410327 76.88238625 -66.79410327 76.88238625 -66 79 C-63.99797742 80.5396507 -62.09528396 81.21949926 -59.7109375 82.046875 C-56.73476779 83.09325167 -54.09793938 84.45890215 -51.3125 85.9375 C-38.3452992 92.48759887 -25.61424808 96.53377257 -11 95 C-4.20973242 92.74665953 0.87138557 89.92919957 5 84 C6.03591886 81.95747237 6.03591886 81.95747237 6.6875 79.9375 C6.91824219 79.28652344 7.14898437 78.63554687 7.38671875 77.96484375 C11.1094197 66.03797383 9.60614903 52.06891844 7.5 39.9375 C7.37665283 39.09960938 7.25330566 38.26171875 7.1262207 37.3984375 C6.24659151 32.88343204 6.24659151 32.88343204 3.1640625 29.66894531 C1.06923454 28.61336435 1.06923454 28.61336435 -1.04492188 27.8659668 C-4.61299004 26.28555499 -6.54662884 23.54595649 -8 20 C-8.80072356 15.14176381 -8.39046171 11.1508345 -6.8125 6.5 C-4.75605654 3.66352626 -3.3418448 2.9032013 0 2 C0 1.34 0 0.68 0 0 Z " fill="#15BAAD" transform="translate(375,290)"/>
 <path d="M0 0 C3.39149843 0.19231447 5.65235724 0.86276355 8.77294922 2.16259766 C10.31281494 2.79319092 10.31281494 2.79319092 11.88378906 3.43652344 C12.96354004 3.8901123 14.04329102 4.34370117 15.15576172 4.81103516 C17.41561289 5.7394961 19.6760293 6.66658245 21.93701172 7.59228516 C23.03013672 8.04216797 24.12326172 8.49205078 25.24951172 8.95556641 C29.02393725 10.48771079 32.82861605 11.91716734 36.65576172 13.31103516 C42.52595408 15.47697615 48.27851924 17.84997481 54.03076172 20.31103516 C60.12465683 22.91819518 66.19798791 25.26057951 72.52294922 27.26025391 C76.55704081 28.61447446 80.434927 30.298605 84.34716797 31.96728516 C87.13501415 33.1254849 89.9369874 34.17419006 92.78076172 35.18603516 C96.60871015 36.5496391 100.35365988 38.03358524 104.09326172 39.62353516 C108.30060558 41.40356525 112.52686594 43.00285383 116.84326172 44.49853516 C122.65252714 46.53371018 128.30724783 48.83308785 133.96826172 51.24853516 C144.57758115 55.77165352 155.32262124 59.59069413 166.28076172 63.18603516 C166.28076172 63.84603516 166.28076172 64.50603516 166.28076172 65.18603516 C167.95138672 65.40259766 167.95138672 65.40259766 169.65576172 65.62353516 C173.28076172 66.18603516 173.28076172 66.18603516 175.28076172 67.18603516 C175.35109417 77.44569457 175.40398657 87.7052942 175.43619823 97.96514797 C175.45167879 102.73214327 175.47258313 107.49897052 175.50708008 112.26586914 C175.79860354 153.67953843 175.79860354 153.67953843 172.28076172 174.18603516 C172.06589111 175.45874268 171.85102051 176.7314502 171.62963867 178.04272461 C171.09471278 180.92149077 170.49649312 183.7696657 169.84326172 186.62353516 C169.62645752 187.60829834 169.40965332 188.59306152 169.1862793 189.60766602 C168.7542767 191.56670319 168.31820235 193.52484834 167.87744141 195.48193359 C167.33435463 197.94315662 166.8326641 200.40748531 166.35107422 202.88134766 C160.07552797 234.39126891 160.07552797 234.39126891 154.28076172 240.18603516 C149.67320149 240.54046287 146.53718628 239.74178802 142.34326172 237.87353516 C141.30814453 237.41978516 140.27302734 236.96603516 139.20654297 236.49853516 C138.24103516 236.06541016 137.27552734 235.63228516 136.28076172 235.18603516 C134.86529307 234.57906703 133.44888028 233.97428599 132.03076172 233.37353516 C131.12326172 232.98166016 130.21576172 232.58978516 129.28076172 232.18603516 C129.79580827 228.06566277 130.88868782 224.54759279 132.39794922 220.69384766 C134.1881099 215.60852394 135.41930336 210.35112815 136.76464844 205.13427734 C137.24425801 203.32383062 137.76290804 201.5238498 138.28466797 199.72509766 C148.89425289 162.69556598 147.56586729 124.30031816 147.28076172 86.18603516 C128.29295484 78.29426719 128.29295484 78.29426719 109.01123047 71.16650391 C105.69982571 69.97743009 102.53582509 68.55360575 99.34326172 67.08056641 C97.2444309 66.17027804 95.1467869 65.44488517 92.96826172 64.74853516 C89.42031915 63.612948 86.02096273 62.2703084 82.59326172 60.81103516 C78.20072411 58.94685782 73.7837794 57.26482195 69.28076172 55.68603516 C64.99016724 54.17941419 60.77550571 52.5959259 56.59326172 50.81103516 C50.4891604 48.21144484 44.27995516 45.93783156 38.04174805 43.68457031 C33.38284138 41.99421781 28.83578468 40.14347824 24.28076172 38.18603516 C21.9540811 37.33430386 19.62063879 36.50081378 17.28076172 35.68603516 C13.54733555 34.38367719 9.93829346 33.0854405 6.40576172 31.31103516 C-0.87400833 28.69031794 -6.89703509 31.92981355 -13.58251953 34.86572266 C-16.5770508 36.12618538 -19.55892303 37.14958532 -22.65673828 38.12353516 C-27.01642969 39.52750358 -31.08301101 41.21898548 -35.21923828 43.18603516 C-40.31911454 45.61136367 -45.39703607 47.49203041 -50.77392578 49.19775391 C-53.7243119 50.18773758 -56.54751697 51.33398514 -59.40673828 52.56103516 C-64.9928711 54.94670292 -70.66247535 56.98654038 -76.40551758 58.95507812 C-84.64139199 61.79530668 -92.66278615 65.15524522 -100.71044922 68.48413086 C-108.99301098 71.90490216 -117.27365382 75.192185 -125.73876953 78.13525391 C-132.52322118 80.52715101 -139.10865685 83.35292883 -145.71923828 86.18603516 C-146.04923828 97.07603516 -146.37923828 107.96603516 -146.71923828 119.18603516 C-153.46992377 118.06092091 -153.46992377 118.06092091 -156.62939453 116.84619141 C-157.309375 116.58773437 -157.98935547 116.32927734 -158.68994141 116.06298828 C-159.72538086 115.65983398 -159.72538086 115.65983398 -160.78173828 115.24853516 C-161.47589844 114.98363281 -162.17005859 114.71873047 -162.88525391 114.44580078 C-166.51047811 113.0583693 -170.1148548 111.62778855 -173.71923828 110.18603516 C-173.71923828 96.32603516 -173.71923828 82.46603516 -173.71923828 68.18603516 C-166.28352566 64.46817885 -160.32604392 61.50108458 -152.60595703 59.14306641 C-149.61144211 58.19573425 -149.61144211 58.19573425 -146.38720703 56.75634766 C-142.42437472 55.05979964 -138.41970643 53.6436662 -134.34423828 52.24853516 C-129.05036143 50.41128186 -123.89136383 48.48224727 -118.80908203 46.11181641 C-116.37831383 45.03500881 -113.91123993 44.14020879 -111.40673828 43.24853516 C-107.72682708 41.93788185 -104.12254013 40.53594592 -100.53173828 38.99853516 C-92.23480346 35.48955482 -83.76905774 32.41538121 -75.32861328 29.27197266 C-74.36810059 28.91409668 -73.40758789 28.5562207 -72.41796875 28.1875 C-70.73638181 27.56348429 -69.0533511 26.94332862 -67.36816406 26.32910156 C-63.80692596 25.02300981 -60.42876762 23.61774378 -57.09423828 21.81103516 C-50.02107439 18.197571 -41.73668273 14.18603516 -33.71923828 14.18603516 C-33.71923828 13.52603516 -33.71923828 12.86603516 -33.71923828 12.18603516 C-32.89423828 11.89470703 -32.06923828 11.60337891 -31.21923828 11.30322266 C-24.43101539 8.89400962 -17.65800663 6.44710301 -10.90673828 3.93603516 C-9.85776367 3.54907471 -9.85776367 3.54907471 -8.78759766 3.15429688 C-0.42955784 0.02938796 -0.42955784 0.02938796 0 0 Z " fill="#1AC795" transform="translate(398.71923828125,231.81396484375)"/>
@@ -583,115 +433,169 @@
 </svg>
     `;
 
-        // User Icon SVG
-        const USER_SVG_ICON = `<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+    const USER_LOGO_URL = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>';
 
-        const flowEndpoints = [
-            "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
-            "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
-            "https://neo-nwdz.onrender.com/api/v1/prediction/598700f9-93ef-4580-b745-e8623e7c5cc4",
-            "https://neo-nwdz.onrender.com/api/v1/prediction/1a1755be-90f1-4a2a-9bc4-fa8f2ca11561"
-        ];
+    // Process SVG to remove black background and add visibility filter
+    function processSVGLogo(svgCode, forAvatar = false) {
+        // Remove the black background path (first path element with fill="#000000")
+        let processed = svgCode.replace(
+            /<path[^>]*fill="#000000"[^>]*\/>/i,
+            ''
+        );
+        
+        // Update SVG dimensions
+        processed = processed.replace('width="800" height="800"', 'width="100%" height="100%" viewBox="0 0 800 800"');
+        
+        return processed;
+    }
 
-        const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
-        let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
-        localStorage.setItem('neo_chat_id', chatId);
-
-        function scrollToBottom() {
-            chatbox.scrollTop = chatbox.scrollHeight;
+    // Initialize header logo
+    function initHeaderLogo() {
+        const headerLogo = document.getElementById('headerLogo');
+        if (headerLogo) {
+            // Create a wrapper div for the SVG
+            const svgWrapper = document.createElement('div');
+            svgWrapper.style.width = '100%';
+            svgWrapper.style.height = '100%';
+            svgWrapper.style.display = 'flex';
+            svgWrapper.style.alignItems = 'center';
+            svgWrapper.style.justifyContent = 'center';
+            svgWrapper.style.overflow = 'hidden';
+            
+            // Set the SVG content with scaling
+            svgWrapper.innerHTML = processSVGLogo(NEO_SVG_CODE);
+            headerLogo.appendChild(svgWrapper);
         }
+    }
 
-        function createMessage(text, sender, isLoading = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender} ${isLoading ? 'loading-animation' : ''}`;
+    // Initialize logo when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeaderLogo);
+    } else {
+        initHeaderLogo();
+    }
 
-            const avatarWrapper = document.createElement('div');
-            avatarWrapper.className = 'avatar-wrapper';
+    const flowEndpoints = [
+        "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/598700f9-93ef-4580-b745-e8623e7c5cc4",
+        "https://neo-nwdz.onrender.com/api/v1/prediction/1a1755be-90f1-4a2a-9bc4-fa8f2ca11561"
+    ];
 
-            const glow = document.createElement('div');
-            glow.className = 'loading-glow';
-            avatarWrapper.appendChild(glow);
+    const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
 
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = (sender === 'bot') ? NEO_SVG_CODE : USER_SVG_ICON;
+    let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
+    localStorage.setItem('neo_chat_id', chatId);
 
-            avatarWrapper.appendChild(avatar);
+    function scrollToBottom() {
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
 
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.textContent = isLoading ? "Neo is thinking..." : text;
+    function createMessage(text, sender, isLoading = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${sender} ${isLoading ? 'loading-animation' : ''}`;
+        
+        const avatarWrapper = document.createElement('div');
+        avatarWrapper.className = 'avatar-wrapper';
+        
+        const glow = document.createElement('div');
+        glow.className = 'loading-glow';
+        avatarWrapper.appendChild(glow);
 
-            msgDiv.appendChild(avatarWrapper);
-            msgDiv.appendChild(bubble);
-            chatbox.appendChild(msgDiv);
-            scrollToBottom();
-
-            return { msgDiv, bubble };
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        
+        if(sender === 'bot') {
+            avatar.innerHTML = processSVGLogo(NEO_SVG_CODE, true);
+        } else {
+            avatar.innerHTML = `<img src="${USER_LOGO_URL}">`;
         }
+        
+        avatarWrapper.appendChild(avatar);
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = isLoading ? "Neo is thinking..." : text;
+        
+        msgDiv.appendChild(avatarWrapper); 
+        msgDiv.appendChild(bubble);
+        chatbox.appendChild(msgDiv);
+        scrollToBottom();
+        
+        return { msgDiv, bubble };
+    }
 
-        function renderMarkdown(element, text, parentMsgDiv) {
-            let i = 0;
-            element.innerHTML = "";
-            const parsedText = marked.parse(text);
-            element.innerHTML = parsedText; // Gemini style direct load (smoothness optimization)
-            parentMsgDiv.classList.remove('loading-animation');
-            addCopyButtons(element);
-            Prism.highlightAll();
-            scrollToBottom();
-        }
-
-        function addCopyButtons(container) {
-            container.querySelectorAll('pre').forEach(pre => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'code-container';
-                pre.parentNode.insertBefore(wrapper, pre);
-                wrapper.appendChild(pre);
-                const button = document.createElement('button');
-                button.className = 'copy-btn';
-                button.innerText = 'Copy';
-                wrapper.appendChild(button);
-                button.addEventListener('click', () => {
-                    navigator.clipboard.writeText(pre.innerText).then(() => {
-                        button.innerText = 'Copied!';
-                        setTimeout(() => { button.innerText = 'Copy'; }, 2000);
-                    });
-                });
-            });
-        }
-
-        async function handleSend() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            createMessage(text, 'user');
-            userInput.value = "";
-
-            const botObj = createMessage("", 'bot', true);
-
-            try {
-                const res = await fetch(selectedEndpoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: text, overrideConfig: { sessionId: chatId } })
-                });
-                const data = await res.json();
-                const reply = data.text || (typeof data === 'string' ? data : "Error!");
-                renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
-            } catch (e) {
-                botObj.msgDiv.classList.remove('loading-animation');
-                botObj.bubble.textContent = "Error! কানেকশনে সমস্যা মামা।";
+    function renderMarkdown(element, text, parentMsgDiv) {
+        let i = 0;
+        element.textContent = ""; 
+        
+        function type() {
+            if (i < text.length) {
+                element.innerHTML = marked.parse(text.substring(0, i + 1));
+                i++;
+                if (chatbox.scrollHeight - chatbox.scrollTop < 800) scrollToBottom();
+                requestAnimationFrame(type);
+            } else {
+                parentMsgDiv.classList.remove('loading-animation');
+                addCopyButtons(element);
+                Prism.highlightAll();
             }
         }
+        type();
+    }
 
-        sendBtn.addEventListener('click', handleSend);
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+    function addCopyButtons(container) {
+        container.querySelectorAll('pre').forEach(pre => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-container';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+            const button = document.createElement('button');
+            button.className = 'copy-btn';
+            button.innerText = 'Copy';
+            wrapper.appendChild(button);
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(pre.innerText).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
+            });
+        });
+    }
 
-        window.onload = () => {
-            document.getElementById('headerLogo').innerHTML = NEO_SVG_CODE;
-            createMessage("Hello! আমি NEO", 'bot');
-        };
-    </script>
+    async function handleSend() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        createMessage(text, 'user');
+        userInput.value = "";
+
+        const botObj = createMessage("", 'bot', true); 
+
+        try {
+            const res = await fetch(selectedEndpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: text, overrideConfig: { sessionId: chatId } })
+            });
+            const data = await res.json();
+            const reply = data.text || (typeof data === 'string' ? data : "Error!");
+            renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
+        } catch (e) {
+            botObj.msgDiv.classList.remove('loading-animation');
+            botObj.bubble.textContent = "Error! কানেকশনে সমস্যা মামা।";
+        }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+    userInput.addEventListener('focus', () => {
+        setTimeout(scrollToBottom, 100);
+    });
+
+    window.onload = () => {
+        createMessage("Hello! আমি NEO", 'bot');
+    };
+</script>
 </body>
-
 </html>
