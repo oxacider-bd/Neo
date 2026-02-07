@@ -33,10 +33,10 @@
         }
         #chatbox::-webkit-scrollbar { display: none; }
 
-        .message { display: flex; gap: 14px; max-width: 90%; }
+        .message { display: flex; gap: 14px; max-width: 90%; align-items: flex-start; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         
-        /* --- Gemini Style Avatar Wrapper & Glow --- */
+        /* Avatar & Glow Effect */
         .avatar-wrapper {
             position: relative;
             width: 34px;
@@ -69,7 +69,8 @@
             border-radius: 10px; 
             position: relative; 
             z-index: 1; 
-            background: var(--bg-dark);
+            background: #111827;
+            display: block;
         }
         
         .bubble { font-size: 15px; line-height: 1.6; color: #e5e7eb; width: 100%; }
@@ -141,7 +142,7 @@
     const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
 
     function scrollToBottom() {
-        setTimeout(() => { chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' }); }, 50);
+        chatbox.scrollTop = chatbox.scrollHeight;
     }
 
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
@@ -149,8 +150,8 @@
 
     function resetChat() { localStorage.removeItem('neo_chat_id'); location.reload(); }
 
-    // মেইন মেসেজ ফাংশন - লোগো ইনজেক্ট করার জন্য
-    function createBotMessageElement(isLoading = false) {
+    // BOT MESSAGE CREATION
+    function createBotSkeleton(isLoading = false) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message bot ${isLoading ? 'loading-animation' : ''}`;
         
@@ -176,7 +177,7 @@
         chatbox.appendChild(msgDiv);
         scrollToBottom();
         
-        return { msgDiv, bubble, img };
+        return { msgDiv, bubble };
     }
 
     function addUserMessage(text) {
@@ -194,25 +195,27 @@
     }
 
     function renderMarkdown(element, text, parentMsgDiv) {
-        let i = 0; let current = "";
-        const interval = setInterval(() => {
+        let i = 0;
+        element.textContent = ""; // এখানে খালি করছি একদম টাইপিং শুরুর মুহূর্তে
+        
+        function type() {
             if (i < text.length) {
-                current += text.charAt(i);
-                element.innerHTML = marked.parse(current);
+                let currentText = text.substring(0, i + 1);
+                element.innerHTML = marked.parse(currentText);
                 i++;
-                if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
+                if (chatbox.scrollHeight - chatbox.scrollTop < 500) scrollToBottom();
+                requestAnimationFrame(type);
             } else {
-                clearInterval(interval);
                 parentMsgDiv.classList.remove('loading-animation');
                 addCopyButtons(element);
                 Prism.highlightAll();
             }
-        }, 15);
+        }
+        type();
     }
 
     function addCopyButtons(container) {
-        const pres = container.querySelectorAll('pre');
-        pres.forEach(pre => {
+        container.querySelectorAll('pre').forEach(pre => {
             if (pre.parentElement.className === 'code-container') return;
             const wrapper = document.createElement('div');
             wrapper.className = 'code-container';
@@ -238,8 +241,8 @@
         addUserMessage(text);
         userInput.value = "";
 
-        // ১. বটের জন্য লোগোসহ লোডিং মেসেজ সাথে সাথে তৈরি করা
-        const botObj = createBotMessageElement(true); 
+        // লোগো এবং লোডিং সাথে সাথে আসবে
+        const botObj = createBotSkeleton(true); 
 
         try {
             const res = await fetch(selectedEndpoint, {
@@ -250,13 +253,12 @@
             const data = await res.json();
             const reply = data.text || (typeof data === 'string' ? data : "Error!");
             
-            // ২. উত্তর চলে আসলে লোডিং টেক্সট মুছে টাইপিং শুরু
-            botObj.bubble.textContent = ""; 
+            // টাইপিং শুরু
             renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
             
         } catch (e) {
             botObj.msgDiv.classList.remove('loading-animation');
-            botObj.bubble.textContent = "Error! কানেকশনে সমস্যা মামা।";
+            botObj.bubble.textContent = "Error! মামা, সার্ভারে সমস্যা।";
         }
     }
 
@@ -264,7 +266,7 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        const botObj = createBotMessageElement(false);
+        const botObj = createBotSkeleton(false);
         botObj.bubble.textContent = "সালাম মামা! আমি NEO। কী জানতে চাস বল।";
     };
 </script>
