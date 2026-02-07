@@ -15,7 +15,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body, html { height: 100%; width: 100%; background: var(--bg-dark); overflow: hidden; }
-
         .app-container { display: flex; flex-direction: column; height: 100dvh; width: 100%; }
 
         .header { 
@@ -36,24 +35,17 @@
         .message { display: flex; gap: 14px; max-width: 90%; align-items: flex-start; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         
-        /* Avatar & Glow Effect */
         .avatar-wrapper {
-            position: relative;
-            width: 34px;
-            height: 34px;
-            flex-shrink: 0;
+            position: relative; width: 34px; height: 34px; flex-shrink: 0;
+            background: #111827; border-radius: 10px;
         }
 
         .loading-glow {
-            position: absolute;
-            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
             border-radius: 12px;
             background: linear-gradient(45deg, #3b82f6, #10b981, #3b82f6, #8b5cf6);
-            background-size: 400% 400%;
-            z-index: 0;
-            filter: blur(5px);
-            display: none;
-            animation: geminiGradient 3s ease infinite;
+            background-size: 400% 400%; z-index: 0; filter: blur(4px);
+            display: none; animation: geminiGradient 3s ease infinite;
         }
 
         @keyframes geminiGradient {
@@ -65,21 +57,16 @@
         .loading-animation .loading-glow { display: block !important; }
 
         .avatar { 
-            width: 34px; height: 34px; 
-            border-radius: 10px; 
-            position: relative; 
-            z-index: 1; 
-            background: #111827;
-            display: block;
+            width: 34px; height: 34px; border-radius: 10px; 
+            position: relative; z-index: 1; display: block;
         }
         
         .bubble { font-size: 15px; line-height: 1.6; color: #e5e7eb; width: 100%; }
         .message.user .bubble { 
             background: #2563eb; color: white; padding: 10px 18px; 
-            border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
+            border-radius: 20px; border-bottom-right-radius: 4px; max-content: fit-content;
         }
 
-        /* Code Block Styling */
         .code-container { position: relative; margin: 15px 0; }
         .copy-btn {
             position: absolute; right: 10px; top: 10px;
@@ -132,6 +119,10 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
+    // লোগো ইউআরএল গুলো ভেরিয়েবল এ রাখলাম যাতে হারানো অসম্ভব হয়
+    const NEO_LOGO = 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png';
+    const USER_LOGO = 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+
     const flowEndpoints = [
         "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
         "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
@@ -150,10 +141,9 @@
 
     function resetChat() { localStorage.removeItem('neo_chat_id'); location.reload(); }
 
-    // BOT MESSAGE CREATION
-    function createBotSkeleton(isLoading = false) {
+    function createMessage(text, sender, isLoading = false) {
         const msgDiv = document.createElement('div');
-        msgDiv.className = `message bot ${isLoading ? 'loading-animation' : ''}`;
+        msgDiv.className = `message ${sender} ${isLoading ? 'loading-animation' : ''}`;
         
         const avatarWrapper = document.createElement('div');
         avatarWrapper.className = 'avatar-wrapper';
@@ -161,16 +151,16 @@
         const glow = document.createElement('div');
         glow.className = 'loading-glow';
         
-        const img = document.createElement('img');
+        const img = new Image();
         img.className = 'avatar';
-        img.src = 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png';
+        img.src = sender === 'bot' ? NEO_LOGO : USER_LOGO;
         
         avatarWrapper.appendChild(glow);
         avatarWrapper.appendChild(img);
         
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        if(isLoading) bubble.textContent = "Neo is thinking...";
+        bubble.textContent = isLoading ? "Neo is thinking..." : text;
         
         msgDiv.appendChild(avatarWrapper); 
         msgDiv.appendChild(bubble);
@@ -180,30 +170,15 @@
         return { msgDiv, bubble };
     }
 
-    function addUserMessage(text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message user';
-        const img = document.createElement('img');
-        img.className = 'avatar';
-        img.src = 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.textContent = text;
-        msgDiv.appendChild(img); msgDiv.appendChild(bubble);
-        chatbox.appendChild(msgDiv);
-        scrollToBottom();
-    }
-
     function renderMarkdown(element, text, parentMsgDiv) {
         let i = 0;
-        element.textContent = ""; // এখানে খালি করছি একদম টাইপিং শুরুর মুহূর্তে
+        element.textContent = ""; 
         
         function type() {
             if (i < text.length) {
-                let currentText = text.substring(0, i + 1);
-                element.innerHTML = marked.parse(currentText);
+                element.innerHTML = marked.parse(text.substring(0, i + 1));
                 i++;
-                if (chatbox.scrollHeight - chatbox.scrollTop < 500) scrollToBottom();
+                if (chatbox.scrollHeight - chatbox.scrollTop < 600) scrollToBottom();
                 requestAnimationFrame(type);
             } else {
                 parentMsgDiv.classList.remove('loading-animation');
@@ -238,11 +213,10 @@
         const text = userInput.value.trim();
         if (!text) return;
 
-        addUserMessage(text);
+        createMessage(text, 'user');
         userInput.value = "";
 
-        // লোগো এবং লোডিং সাথে সাথে আসবে
-        const botObj = createBotSkeleton(true); 
+        const botObj = createMessage("", 'bot', true); 
 
         try {
             const res = await fetch(selectedEndpoint, {
@@ -253,12 +227,11 @@
             const data = await res.json();
             const reply = data.text || (typeof data === 'string' ? data : "Error!");
             
-            // টাইপিং শুরু
             renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
             
         } catch (e) {
             botObj.msgDiv.classList.remove('loading-animation');
-            botObj.bubble.textContent = "Error! মামা, সার্ভারে সমস্যা।";
+            botObj.bubble.textContent = "Error! মামা কানেকশন প্রবলেম।";
         }
     }
 
@@ -266,8 +239,7 @@
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        const botObj = createBotSkeleton(false);
-        botObj.bubble.textContent = "সালাম মামা! আমি NEO। কী জানতে চাস বল।";
+        createMessage("সালাম মামা! আমি NEO। কী জানতে চাস বল।", 'bot');
     };
 </script>
 
