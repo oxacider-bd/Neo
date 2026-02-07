@@ -14,18 +14,9 @@
         :root { --primary: #3b82f6; --bg-dark: #0b1120; --panel: #111827; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body, html { 
-            height: 100%; width: 100%; 
-            background: var(--bg-dark); 
-            overflow: hidden; 
-        }
+        body, html { height: 100%; width: 100%; background: var(--bg-dark); overflow: hidden; }
 
-        .app-container { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100dvh; 
-            width: 100%;
-        }
+        .app-container { display: flex; flex-direction: column; height: 100dvh; width: 100%; }
 
         .header { 
             padding: 14px 20px; background: var(--panel); 
@@ -33,24 +24,22 @@
             border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
         }
         .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
-        .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+        .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
 
         #chatbox { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 24px;
-            scroll-behavior: smooth;
-            scrollbar-width: none; 
-            -ms-overflow-style: none; 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            display: flex; flex-direction: column; gap: 24px;
+            scroll-behavior: smooth; scrollbar-width: none; 
         }
         #chatbox::-webkit-scrollbar { display: none; }
 
-        .message { display: flex; gap: 14px; max-width: 90%; }
+        .message { display: flex; gap: 14px; max-width: 90%; position: relative; }
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        
+        /* Avatar & Animation */
         .avatar { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
+        .loading-animation { animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .bubble { font-size: 15px; line-height: 1.6; color: #e5e7eb; width: 100%; }
         .message.user .bubble { 
@@ -58,37 +47,35 @@
             border-radius: 20px; border-bottom-right-radius: 4px; max-width: fit-content;
         }
 
-        .bubble h3 { color: white; margin-bottom: 10px; font-size: 18px; }
-        .bubble p { margin-bottom: 12px; }
-        .bubble strong { color: white; }
-        pre { background: #000 !important; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid #333; overflow-x: auto; }
-        code { font-family: 'Consolas', monospace; color: #10b981; }
+        /* Code Block Styling with Copy Button */
+        .code-container { position: relative; margin: 15px 0; }
+        .copy-btn {
+            position: absolute; right: 10px; top: 10px;
+            background: rgba(255,255,255,0.1); color: #ccc;
+            border: 1px solid rgba(255,255,255,0.2); padding: 4px 8px;
+            border-radius: 6px; font-size: 10px; cursor: pointer; z-index: 10;
+        }
+        .copy-btn:hover { background: var(--primary); color: white; }
+
+        pre { 
+            background: #000 !important; padding: 15px; border-radius: 12px; 
+            border: 1px solid #333; overflow-x: hidden; 
+            white-space: pre-wrap; word-wrap: break-word;
+        }
+        code { font-family: 'Consolas', monospace; color: #10b981; word-break: break-all; }
 
         .input-area {
-            background: var(--panel);
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
+            background: var(--panel); padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
-
         .input-content {
-            max-width: 800px; margin: 0 auto;
-            display: flex; gap: 10px; align-items: center;
+            max-width: 800px; margin: 0 auto; display: flex; gap: 10px; align-items: center;
             background: #1f2937; padding: 6px 6px 6px 16px;
             border-radius: 26px; border: 1px solid rgba(255,255,255,0.1);
         }
-
-        input { 
-            flex: 1; background: transparent; border: none; 
-            color: white; outline: none; font-size: 16px; 
-            padding: 8px 0;
-        }
-
-        .send-btn { 
-            background: var(--primary); border: none; width: 38px; height: 38px; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; padding: 8px 0; }
+        .send-btn { background: var(--primary); border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .send-btn svg { width: 20px; height: 20px; fill: white; }
     </style>
 </head>
@@ -99,9 +86,7 @@
         <h1>NEO SYSTEM</h1>
         <button class="reset-btn" onclick="resetChat()">Reset</button>
     </div>
-
     <div id="chatbox"></div>
-
     <div class="input-area">
         <div class="input-content">
             <input type="text" id="userInput" placeholder="Ask Neo anything..." autocomplete="off">
@@ -117,7 +102,6 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // --- ৪টি এপিআই এন্ডপয়েন্ট রোটেশন (The Core Change) ---
     const flowEndpoints = [
         "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
         "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
@@ -125,41 +109,41 @@
         "https://neo-nwdz.onrender.com/api/v1/prediction/1a1755be-90f1-4a2a-9bc4-fa8f2ca11561"
     ];
 
-    // র্যান্ডমলি একটি এন্ডপয়েন্ট সিলেক্ট করা (প্রতি পেজ লোডে বা সেশনে একবার সেট হবে)
     const selectedEndpoint = flowEndpoints[Math.floor(Math.random() * flowEndpoints.length)];
-    console.log("NEO is running on:", selectedEndpoint);
 
     function scrollToBottom() {
-        setTimeout(() => {
-            chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' });
-        }, 100);
+        setTimeout(() => { chatbox.scrollTo({ top: chatbox.scrollHeight, behavior: 'smooth' }); }, 100);
     }
-
-    userInput.addEventListener('focus', () => {
-        setTimeout(scrollToBottom, 300);
-    });
 
     let chatId = localStorage.getItem('neo_chat_id') || "chat_" + Math.random().toString(36).substring(7);
     localStorage.setItem('neo_chat_id', chatId);
 
     function resetChat() { localStorage.removeItem('neo_chat_id'); location.reload(); }
 
-    function addMessage(text, sender) {
+    function addMessage(text, sender, isLoading = false) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}`;
+        
         const img = document.createElement('img');
-        img.className = 'avatar';
+        img.className = `avatar ${isLoading ? 'loading-animation' : ''}`;
         img.src = sender === 'bot' ? 'https://i.postimg.cc/ZqkRc3gD/Neo-LOGO.png' : 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
+        
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
+        
         msgDiv.appendChild(img); msgDiv.appendChild(bubble);
         chatbox.appendChild(msgDiv);
         
-        if(sender === 'bot') renderMarkdown(bubble, text); else bubble.textContent = text;
+        if(sender === 'bot' && !isLoading) {
+            renderMarkdown(bubble, text, img);
+        } else {
+            bubble.textContent = text;
+        }
         scrollToBottom();
+        return { bubble, img };
     }
 
-    function renderMarkdown(element, text) {
+    function renderMarkdown(element, text, avatarImg) {
         let i = 0; let current = "";
         const interval = setInterval(() => {
             if (i < text.length) {
@@ -168,38 +152,70 @@
                 i++;
                 if (chatbox.scrollHeight - chatbox.scrollTop < 1000) scrollToBottom();
             } else {
-                clearInterval(interval); Prism.highlightAll();
+                clearInterval(interval);
+                if(avatarImg) avatarImg.classList.remove('loading-animation');
+                addCopyButtons(element);
+                Prism.highlightAll();
             }
         }, 15);
     }
 
-    async function fetchResponse(message) {
-        try {
-            // এখন আর একটা এন্ডপয়েন্ট না, বরং selectedEndpoint ব্যবহার হবে
-            const res = await fetch(selectedEndpoint, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ question: message, overrideConfig: { sessionId: chatId } })
+    function addCopyButtons(container) {
+        const pres = container.querySelectorAll('pre');
+        pres.forEach(pre => {
+            if (pre.parentElement.className === 'code-container') return;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'code-container';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+
+            const button = document.createElement('button');
+            button.className = 'copy-btn';
+            button.innerText = 'Copy';
+            wrapper.appendChild(button);
+
+            button.addEventListener('click', () => {
+                const code = pre.innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
             });
-            const data = await res.json();
-            return data.text || (typeof data === 'string' ? data : "মামা, কোনো রেসপন্স আসলো না।");
-        } catch (e) { return "**Connection Error!** সার্ভারে একটু জ্যাম মামা। আবার ট্রাই কর!"; }
+        });
     }
 
     async function handleSend() {
         const text = userInput.value.trim();
         if (!text) return;
+
         addMessage(text, 'user');
         userInput.value = "";
-        const reply = await fetchResponse(text);
-        addMessage(reply, 'bot');
+
+        // লোডিং মেসেজ তৈরি
+        const { bubble, img } = addMessage("Neo is thinking...", 'bot', true);
+
+        try {
+            const res = await fetch(selectedEndpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: text, overrideConfig: { sessionId: chatId } })
+            });
+            const data = await res.json();
+            const reply = data.text || (typeof data === 'string' ? data : "Error!");
+            
+            bubble.textContent = ""; // লোডিং টেক্সট মোছা
+            renderMarkdown(bubble, reply, img);
+        } catch (e) {
+            img.classList.remove('loading-animation');
+            bubble.textContent = "Connection Error মামা!";
+        }
     }
 
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
     window.onload = () => {
-        addMessage("সালাম মামা! আমি NEO। সাইবার সিকিউরিটি নিয়ে কি জানতে চাস বল। তোর নাম কী?", 'bot');
+        addMessage("Hi! আমি NEO", 'bot');
     };
 </script>
 
