@@ -22,6 +22,25 @@
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
         }
+
+        .logo-container {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,255,65,0.05);
+            border-radius: 6px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .logo-container svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 3px #00FF41) drop-shadow(0 0 8px rgba(0,255,65,0.3));
+        }
+
         .header h1 { font-size: 15px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
         .reset-btn { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
 
@@ -65,7 +84,12 @@
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
         
-        .avatar svg, .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar svg, .avatar img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            filter: saturate(1.3) brightness(1.1);
+        }
         
         /* লোডিং অবস্থায় আইকন একটু ছোট হবে */
         .loading-animation .avatar { width: 28px; height: 28px; transition: 0.3s; }
@@ -109,7 +133,10 @@
 
 <div class="app-container">
     <div class="header">
-        <h1>NEO SYSTEM</h1>
+        <div style="display: flex; align-items: center; flex: 1;">
+            <div class="logo-container" id="headerLogo"></div>
+            <h1>NEO SYSTEM</h1>
+        </div>
         <button class="reset-btn" onclick="location.reload()">Reset</button>
     </div>
     <div id="chatbox"></div>
@@ -381,6 +408,46 @@
 
     const USER_LOGO_URL = 'https://cdn-icons-png.flaticon.com/512/1144/1144760.png';
 
+    // Process SVG to remove black background and add visibility filter
+    function processSVGLogo(svgCode, forAvatar = false) {
+        // Remove the black background path (first path element with fill="#000000")
+        let processed = svgCode.replace(
+            /<path[^>]*fill="#000000"[^>]*\/>/i,
+            ''
+        );
+        
+        // Update SVG dimensions
+        processed = processed.replace('width="800" height="800"', 'width="100%" height="100%" viewBox="0 0 800 800"');
+        
+        return processed;
+    }
+
+    // Initialize header logo
+    function initHeaderLogo() {
+        const headerLogo = document.getElementById('headerLogo');
+        if (headerLogo) {
+            // Create a wrapper div for the SVG
+            const svgWrapper = document.createElement('div');
+            svgWrapper.style.width = '100%';
+            svgWrapper.style.height = '100%';
+            svgWrapper.style.display = 'flex';
+            svgWrapper.style.alignItems = 'center';
+            svgWrapper.style.justifyContent = 'center';
+            svgWrapper.style.overflow = 'hidden';
+            
+            // Set the SVG content with scaling
+            svgWrapper.innerHTML = processSVGLogo(NEO_SVG_CODE);
+            headerLogo.appendChild(svgWrapper);
+        }
+    }
+
+    // Initialize logo when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeaderLogo);
+    } else {
+        initHeaderLogo();
+    }
+
     const flowEndpoints = [
         "https://neo-nwdz.onrender.com/api/v1/prediction/c8ba2b1a-3be7-4d28-8748-5664e0067ae8",
         "https://neo-nwdz.onrender.com/api/v1/prediction/122c179a-e0cd-4564-aabc-cb0eaa09e6d9",
@@ -412,7 +479,7 @@
         avatar.className = 'avatar';
         
         if(sender === 'bot') {
-            avatar.innerHTML = NEO_SVG_CODE;
+            avatar.innerHTML = processSVGLogo(NEO_SVG_CODE, true);
         } else {
             avatar.innerHTML = `<img src="${USER_LOGO_URL}">`;
         }
@@ -500,6 +567,5 @@
         createMessage("Hello! আমি NEO", 'bot');
     };
 </script>
-
 </body>
 </html>
