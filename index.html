@@ -563,6 +563,17 @@
         });
     }
 
+
+    // ইউজারের নাম সেভ করার এবং চেক করার ফাংশন
+    function getPersistentName() {
+        return localStorage.getItem('neo_user_name');
+    }
+
+    function savePersistentName(name) {
+        localStorage.setItem('neo_user_name', name);
+    }
+
+    // handleSend ফাংশনটা আপডেট করা হলো যাতে নাম ডিটেক্ট করতে পারে
     async function handleSend() {
         const text = userInput.value.trim();
         if (!text) return;
@@ -571,19 +582,42 @@
         userInput.value = "";
 
         const botObj = createMessage("", 'bot', true); 
+        const savedName = getPersistentName();
 
         try {
             const res = await fetch(selectedEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ question: text, overrideConfig: { sessionId: chatId } })
+                body: JSON.stringify({ 
+                    question: text, 
+                    overrideConfig: { 
+                        sessionId: chatId,
+                        // আমরা এখানে নামটা পাঠিয়ে দিচ্ছি যাতে AI বুঝতে পারে কার সাথে কথা বলছে
+                        userName: savedName || "Unknown" 
+                    } 
+                })
             });
+            
             const data = await res.json();
-            const reply = data.text || (typeof data === 'string' ? data : "Error!");
+            let reply = data.text || (typeof data === 'string' ? data : "Error!");
+
+            // --- স্পেশাল মেমোরি লজিক ---
+            // যদি AI ইউজারের নাম প্রথমবার জানতে পারে, আমরা ওটা ব্রাউজারে সেভ করে নিব
+            if (!savedName) {
+                // AI যদি নাম জিজ্ঞেস করার পর ইউজার নাম দেয়, AI সাধারণত "ধন্যবাদ [নাম]" টাইপ কিছু বলে।
+                // আমরা একটা সিম্পল লজিক দিয়ে নামটা সেভ করার চেষ্টা করতে পারি অথবা 
+                // সরাসরি AI এর রিপ্লাই থেকে নাম এক্সট্রাক্ট করার ফিল্টার রাখতে পারি।
+                // আপাতত ইউজার যা ইনপুট দিচ্ছে সেটাকে নাম হিসেবে ধরার একটা ছোট ট্রিক:
+                if (text.length < 20 && !text.includes(" ")) { 
+                     // যদি ছোট ইনপুট হয় (যেমন শুধু "Shihab"), ধরে নিচ্ছি এটা নাম
+                     savePersistentName(text);
+                }
+            }
+
             renderMarkdown(botObj.bubble, reply, botObj.msgDiv);
         } catch (e) {
             botObj.msgDiv.classList.remove('loading-animation');
-            botObj.bubble.textContent = "Error! কানেকশনে সমস্যা মামা।";
+            botObj.bubble.textContent = "Error! কানেকশনে সমস্যা।";
         }
     }
 
@@ -603,8 +637,19 @@
         scrollToBottom();
     });
 
+    // window.onload আপডেট - মেমোরি অনুযায়ী গ্রিটিং
     window.onload = () => {
-        createMessage("Hello! আমি NEO", 'bot');
+        document.getElementById('headerLogo').innerHTML = NEO_SVG_CODE;
+        
+        const userName = getPersistentName();
+        
+        if (userName) {
+            // যদি নাম মনে থাকে, সরাসরি বন্ডিং শুরু!
+            createMessage(`আসসালামু আলাইকুম ${userName} আরে! আবার দেখা।এখন কী ব্যাপারে?`, 'bot');
+        } else {
+            // প্রথমবার আসলে সেই ফরমাল ইন্ট্রো
+            createMessage("আসসালামু আলাইকুম। আমি Neo, আপনার হাই-টেক ইন্টেলিজেন্স গাইড। শিহাব স্যারের উদ্ভাবনী ভাবনায় এবং OXACIDER-এর ছায়াতলে তৈরি আমি এমন এক AI Mentor, যা আপনাকে Cybersecurity এবং প্রযুক্তির আগামীর চ্যালেঞ্জ মোকাবেলায় দক্ষ করে তুলবে। আপনার সাথে পথচলা শুরুর আগে আপনার নামটি কি জেনে নিতে পারি?", 'bot');
+        }
     };
 </script>
 </body>
